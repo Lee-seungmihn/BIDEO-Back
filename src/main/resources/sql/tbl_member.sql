@@ -54,5 +54,3 @@ comment on column tbl_member.status is '계정 상태 (ACTIVE/SUSPENDED/BANNED)'
 comment on column tbl_member.deleted_datetime is '탈퇴 일시 (soft delete)';
 
 select * from tbl_member;
-
-drop  table tbl_member;

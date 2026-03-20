@@ -15,8 +15,6 @@ create table tbl_oauth
     constraint fk_oauth_member foreign key (member_id) references tbl_member(id)
 );
 
-drop table if exists tbl_oauth cascade;
-
 comment on table tbl_oauth is '회원';
 comment on column tbl_oauth.id is '회원 번호 (PK)';
 comment on column tbl_oauth.member_id is '멤버 아이디';
