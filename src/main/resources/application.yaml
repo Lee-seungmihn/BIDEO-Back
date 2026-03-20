@@ -32,6 +32,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+  profiles:
+    active: sol, oauth
 
   cache:
     type: redis

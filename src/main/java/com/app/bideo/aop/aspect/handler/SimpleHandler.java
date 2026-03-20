@@ -1,6 +1,6 @@
 package com.app.bideo.aop.aspect.handler;
 
-import com.app.app.aop.aspect.util.MethodMatcher;
+import com.app.bideo.aop.aspect.util.MethodMatcher;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.InvocationHandler;
