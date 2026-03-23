@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String provider = (String) oAuth2User.getAttribute("provider");
-        String providerId = String.valueOf(oAuth2User.getAttribute("id"));
+        String providerId = Objects.toString(oAuth2User.getAttribute("id"), null);
         String email = (String) oAuth2User.getAttribute("email");
         String name = (String) oAuth2User.getAttribute("name");
         String profileImage = (String) oAuth2User.getAttribute("profileImage");

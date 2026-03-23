@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum OAuthProvider {
-    NAVER("NAVER"), KAKAO("KAKAO");
+    NAVER("naver"), KAKAO("kakao");
 
     private final String value;
 
@@ -31,6 +31,6 @@ public enum OAuthProvider {
         if (value == null) {
             return null;
         }
-        return LOOKUP.get(value.toUpperCase(Locale.ROOT));
+        return LOOKUP.get(value.toLowerCase(Locale.ROOT));
     }
 }
