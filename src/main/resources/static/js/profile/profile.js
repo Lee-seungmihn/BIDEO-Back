@@ -737,6 +737,11 @@ function openFollowModalTab(e, tab) {
   modal.classList.add('active');
 }
 
+function openGalleryListModal() {
+  if (!IS_OWNER) return;
+  document.getElementById('galleryListModal')?.classList.add('active');
+}
+
 // ─── Viewer 전용: 팔로우 토글 ─────────────────────
 let isFollowing = false;
 
@@ -1197,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
 
-  const upperModals = ['badgeModal', 'nicknameModal', 'followModal', 'passwordModal', 'workDetailModal'];
+  const upperModals = ['badgeModal', 'nicknameModal', 'followModal', 'passwordModal', 'workDetailModal', 'galleryListModal'];
   for (const id of upperModals) {
     const el = document.getElementById(id);
     if (el && el.classList.contains('active')) {

@@ -36,7 +36,7 @@ import java.util.UUID;
 @Transactional(rollbackFor = Exception.class)
 public class WorkService {
 
-    private static final String WORK_UPLOAD_DIR = "C:/Users/chanh/Desktop/gb_jch/spring/workspace/bideo/uploads/work";
+    private static final Path WORK_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "images", "uploads", "work");
 
     private final WorkDAO workDAO;
     private final GalleryDAO galleryDAO;
@@ -304,12 +304,11 @@ public class WorkService {
         }
 
         try {
-            Path uploadDir = Paths.get(WORK_UPLOAD_DIR);
-            Files.createDirectories(uploadDir);
+            Files.createDirectories(WORK_UPLOAD_DIR);
 
             String originalName = mediaFile.getOriginalFilename() != null ? mediaFile.getOriginalFilename() : "media_file";
             String savedName = UUID.randomUUID() + "_" + originalName.replace(" ", "_");
-            Path savedPath = uploadDir.resolve(savedName);
+            Path savedPath = WORK_UPLOAD_DIR.resolve(savedName);
 
             Files.copy(mediaFile.getInputStream(), savedPath, StandardCopyOption.REPLACE_EXISTING);
 

@@ -90,19 +90,19 @@
     <li class="video-gallery-li owner-only" tabindex="-1">
       <div class="video-gallery-outer">
         <div class="video-gallery-padder">
-          <div class="video-gallery-button" role="button" tabindex="0" onclick="window.location.href='/gallery/gallery-register'">
+          <div class="video-gallery-button" role="button" tabindex="0" onclick="openGalleryListModal()">
             <div class="canvas-parent">
               <canvas class="ring-canvas" width="87" height="87"></canvas>
               <div class="icon-container">
-                <svg aria-label="+ 아이콘" class="plus-icon" fill="currentColor"
+                <svg aria-label="리스트 아이콘" class="plus-icon" fill="currentColor"
                      height="44" width="44" role="img" viewBox="0 0 24 24">
-                  <title>+ 아이콘</title>
-                  <path d="M21 11h-8V3a1 1 0 1 0-2 0v8H3a1 1 0 1 0 0 2h8v8a1 1 0 1 0 2 0v-8h8a1 1 0 1 0 0-2Z"></path>
+                  <title>리스트 아이콘</title>
+                  <path d="M5 7.5A1.5 1.5 0 1 1 3.5 6 1.5 1.5 0 0 1 5 7.5Zm0 4.5A1.5 1.5 0 1 1 3.5 10.5 1.5 1.5 0 0 1 5 12Zm0 4.5A1.5 1.5 0 1 1 3.5 15 1.5 1.5 0 0 1 5 16.5ZM8 6h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Zm0 4.5h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Zm0 4.5h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Z"></path>
                 </svg>
               </div>
             </div>
             <div class="video-gallery-button__label">
-              <span class="video-gallery-button__label-text" dir="auto"><span>신규</span></span>
+              <span class="video-gallery-button__label-text" dir="auto"><span>리스트</span></span>
             </div>
           </div>
         </div>
@@ -554,6 +554,40 @@
       <input class="follow-modal__search-input" type="text" placeholder="검색" oninput="filterFollowList(this.value)">
     </div>
     <div class="follow-modal__list" id="followList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay modal-overlay--upper owner-only" id="galleryListModal" onclick="closeModal('galleryListModal', event)">
+  <div class="gallery-list-modal">
+    <div class="gallery-list-modal__top">
+      <h3 class="gallery-list-modal__title">예술관 리스트</h3>
+      <span></span>
+      <button class="btn-close btn-close--ghost" type="button" onclick="closeModal('galleryListModal')">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+    </div>
+    <div class="gallery-list-modal__body">
+      <a class="gallery-list-modal__item"
+         th:each="gallery : ${galleries}"
+         th:href="@{/profile/profile(galleryId=${gallery.id})}">
+        <div class="gallery-list-modal__thumb">
+          <img th:if="${gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+               th:src="${gallery.coverImage}"
+               alt="예술관 커버">
+          <span th:if="${gallery.coverImage == null or #strings.isEmpty(gallery.coverImage)}"
+                th:text="${#strings.length(gallery.title) > 2 ? #strings.substring(gallery.title, 0, 2) : gallery.title}">예술관</span>
+        </div>
+        <div class="gallery-list-modal__copy">
+          <strong th:text="${gallery.title}">예술관</strong>
+          <span th:text="|작품 ${gallery.workCount != null ? gallery.workCount : 0}개|">작품 0개</span>
+        </div>
+      </a>
+      <div class="gallery-list-modal__empty" th:if="${#lists.isEmpty(galleries)}">
+        등록된 예술관이 없습니다.
+      </div>
+    </div>
   </div>
 </div>
 

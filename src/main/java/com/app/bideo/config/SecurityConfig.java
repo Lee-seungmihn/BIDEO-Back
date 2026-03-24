@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/image/**",
+                                "/uploads/**",
                                 "/static/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

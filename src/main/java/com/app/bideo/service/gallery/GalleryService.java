@@ -22,7 +22,7 @@ import java.util.UUID;
 @Transactional(rollbackFor = Exception.class)
 public class GalleryService {
 
-    private static final String GALLERY_UPLOAD_DIR = "C:/Users/chanh/Desktop/gb_jch/spring/workspace/bideo/uploads/gallery";
+    private static final Path GALLERY_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "images", "uploads", "gallery");
 
     private final GalleryDAO galleryDAO;
     private final WorkDAO workDAO;
@@ -61,12 +61,11 @@ public class GalleryService {
         }
 
         try {
-            Path uploadDir = Paths.get(GALLERY_UPLOAD_DIR);
-            Files.createDirectories(uploadDir);
+            Files.createDirectories(GALLERY_UPLOAD_DIR);
 
             String originalName = coverFile.getOriginalFilename() != null ? coverFile.getOriginalFilename() : "gallery_image";
             String savedName = UUID.randomUUID() + "_" + originalName.replace(" ", "_");
-            Path savedPath = uploadDir.resolve(savedName);
+            Path savedPath = GALLERY_UPLOAD_DIR.resolve(savedName);
 
             Files.copy(coverFile.getInputStream(), savedPath, StandardCopyOption.REPLACE_EXISTING);
             return "/uploads/gallery/" + savedName;
