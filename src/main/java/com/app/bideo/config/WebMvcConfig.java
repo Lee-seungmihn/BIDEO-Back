@@ -10,17 +10,17 @@ import java.nio.file.Paths;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    private static final Path ROOT_UPLOAD_DIR = Paths.get("uploads");
     private static final Path STATIC_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "uploads");
     private static final Path LEGACY_STATIC_IMAGE_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "images", "uploads");
-    private static final Path LEGACY_UPLOAD_DIR = Paths.get("uploads");
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(
+                        ROOT_UPLOAD_DIR.toUri().toString(),
                         STATIC_UPLOAD_DIR.toUri().toString(),
-                        LEGACY_STATIC_IMAGE_UPLOAD_DIR.toUri().toString(),
-                        LEGACY_UPLOAD_DIR.toUri().toString()
+                        LEGACY_STATIC_IMAGE_UPLOAD_DIR.toUri().toString()
                 );
     }
 }

@@ -574,6 +574,7 @@
               th:each="gallery : ${galleries}"
               th:attr="data-gallery-id=${gallery.id},
                        data-gallery-title=${gallery.title},
+                       data-gallery-description=${gallery.description},
                        data-gallery-cover=${gallery.coverImage},
                        data-gallery-owner=${gallery.memberNickname},
                        data-gallery-work-count=${gallery.workCount},
@@ -618,15 +619,24 @@
             <h3 id="galleryCloseupTitle" class="closeup__title gallery-closeup__title">예술관</h3>
             <p id="galleryCloseupDescription" class="closeup__description-text gallery-closeup__description">등록된 예술관 정보입니다.</p>
           </div>
-          <div class="closeup__creator gallery-closeup__creator">
-            <img class="closeup__creator-avatar" src="/images/BIDEO_LOGO/BIDEO_favicon.png" alt="creator">
-            <div class="closeup__creator-copy">
-              <div class="closeup__creator-name-row">
-                <span id="galleryCloseupOwner" class="closeup__creator-name">creator</span>
+            <div class="closeup__creator gallery-closeup__creator">
+              <img class="closeup__creator-avatar" src="/images/BIDEO_LOGO/BIDEO_favicon.png" alt="creator">
+              <div class="closeup__creator-copy">
+                <div class="closeup__creator-name-row">
+                  <span id="galleryCloseupOwner" class="closeup__creator-name">creator</span>
+                  <div class="work-detail-option-wrap owner-only">
+                    <button class="work-detail-option-btn" type="button" aria-label="예술관 옵션 더 보기" onclick="openGalleryActionModal(event)">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="1.5"></circle>
+                        <circle cx="6" cy="12" r="1.5"></circle>
+                        <circle cx="18" cy="12" r="1.5"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="closeup__creator-handle">BIDEO gallery</p>
               </div>
-              <p class="closeup__creator-handle">BIDEO gallery</p>
             </div>
-          </div>
           <div class="gallery-closeup__stats">
             <div class="gallery-closeup__stat">
               <strong id="galleryCloseupWorkCount">0</strong>
@@ -676,6 +686,59 @@
         </div>
       </section>
     </section>
+  </div>
+</div>
+
+<div class="modal-overlay work-action-modal-overlay" id="galleryActionModal" onclick="closeModal('galleryActionModal', event)">
+  <div class="work-action-sheet">
+    <button class="danger" type="button" onclick="editCurrentGallery()">수정하기</button>
+    <button class="danger" type="button" onclick="deleteCurrentGallery()">삭제하기</button>
+    <button class="cancel" type="button" onclick="closeModal('galleryActionModal')">취소</button>
+  </div>
+</div>
+
+<div class="modal-overlay work-edit-modal-overlay" id="galleryEditModal" onclick="closeModal('galleryEditModal', event)">
+  <div class="work-edit-modal gallery-edit-modal">
+    <div class="pin-builder work-edit-builder gallery-edit-builder">
+      <div class="builder-header">
+        <div class="builder-header-left"></div>
+        <div class="work-form-header-actions">
+          <button class="publish-btn work-form-primary-btn work-edit-close-btn" type="button" onclick="closeModal('galleryEditModal')">취소</button>
+          <button class="publish-btn work-form-primary-btn" type="button" onclick="submitGalleryEdit()">수정</button>
+        </div>
+      </div>
+      <div class="builder-body">
+        <div class="upload-section">
+          <div class="upload-area" id="galleryEditUploadArea">
+            <div class="upload-placeholder" id="galleryEditPlaceholder">
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" transform="rotate(-90 12 12)"/></svg>
+              </div>
+              <p class="upload-text">사진을 선택하거나 여기로<br>드래그 앤 드롭하세요</p>
+              <p class="upload-subtext">이미지 파일만 업로드할 수 있습니다.</p>
+            </div>
+            <img class="preview-image" id="galleryEditPreviewImage" alt="예술관 미리보기" style="display:none;">
+            <input type="file" id="galleryEditFileInput" accept="image/*">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label for="galleryEditTitleInput">제목</label>
+            <input type="text" id="galleryEditTitleInput" placeholder="제목을 추가하세요." maxlength="100">
+          </div>
+
+          <div class="form-group">
+            <label for="galleryEditDescriptionInput">설명</label>
+            <textarea id="galleryEditDescriptionInput" placeholder="예술관에 대한 설명을 추가하세요." maxlength="500"></textarea>
+          </div>
+
+          <div class="legal-notice">
+            불법 촬영 콘텐츠 등을 게시하는 경우 Bideo는 한국 전기통신사업법 제22-5(1)조에 미리 해당 콘텐츠의 액세스를 삭제하거나 차단할 수 있으며, 사용자는 관련 법률 및 <a href="#">규정</a>에 따라 처벌을 받을 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
