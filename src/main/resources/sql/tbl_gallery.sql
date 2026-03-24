@@ -8,7 +8,7 @@ create table tbl_gallery (
     member_id     bigint       not null,
     title         varchar(255) not null,
     description   text         null,
-    cover_image   varchar(255) null,
+    cover_image   text         null,
     allow_comment boolean      not null default true,
     show_similar  boolean      not null default true,
     work_count    int      not null default 0,
@@ -29,7 +29,7 @@ comment on column tbl_gallery.id is '예술관 번호 (PK)';
 comment on column tbl_gallery.member_id is '소유자 FK';
 comment on column tbl_gallery.title is '제목';
 comment on column tbl_gallery.description is '설명';
-comment on column tbl_gallery.cover_image is '커버 이미지 URL';
+comment on column tbl_gallery.cover_image is '커버 이미지 URL 또는 data URL';
 comment on column tbl_gallery.allow_comment is '댓글 허용';
 comment on column tbl_gallery.show_similar is '비슷한 작품 표시';
 comment on column tbl_gallery.work_count is '소속 작품 수 (비정규화)';

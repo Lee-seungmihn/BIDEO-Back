@@ -16,6 +16,7 @@
         select
             g.id,
             g.title,
+            g.description,
             g.cover_image,
             m.nickname as member_nickname,
             g.work_count,
@@ -29,6 +30,38 @@
           and g.status != 'DELETED'
         order by g.created_datetime desc, g.id desc
     </select>
+
+    <select id="selectGalleryMemberId" resultType="long">
+        select member_id
+        from tbl_gallery
+        where id = #{id}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <update id="updateGallery">
+        update tbl_gallery
+        set
+            title = #{gallery.title},
+            description = #{gallery.description},
+            cover_image = coalesce(#{gallery.coverImage}, cover_image),
+            allow_comment = coalesce(#{gallery.allowComment}, allow_comment),
+            show_similar = coalesce(#{gallery.showSimilar}, show_similar),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <update id="softDeleteGallery">
+        update tbl_gallery
+        set
+            status = 'DELETED',
+            deleted_datetime = now(),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
 
     <insert id="insertGalleryWork">
         insert into tbl_gallery_work (
@@ -62,5 +95,47 @@
             updated_datetime = now()
         where id = #{galleryId}
     </update>
+
+    <insert id="insertGalleryComment" parameterType="com.app.bideo.domain.interaction.CommentVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_comment (
+            member_id, target_type, target_id, parent_id, content, is_pinned, like_count
+        ) values (
+            #{memberId}, #{targetType}, #{targetId}, #{parentId}, #{content}, coalesce(#{isPinned}, false), coalesce(#{likeCount}, 0)
+        )
+    </insert>
+
+    <update id="increaseGalleryCommentCount">
+        update tbl_gallery
+        set
+            comment_count = coalesce(comment_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <select id="selectGalleryCommentsByGalleryId" resultType="CommentResponseDTO">
+        select
+            c.id,
+            c.member_id,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            c.target_type,
+            c.target_id,
+            c.parent_id,
+            c.content,
+            c.is_pinned,
+            c.like_count,
+            false as is_liked,
+            c.created_datetime,
+            c.updated_datetime
+        from tbl_comment c
+        left join tbl_member m on c.member_id = m.id
+        where c.target_type = 'GALLERY'
+          and c.target_id = #{galleryId}
+          and c.parent_id is null
+          and c.deleted_datetime is null
+        order by c.created_datetime asc, c.id asc
+    </select>
 
 </mapper>

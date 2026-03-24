@@ -6,7 +6,7 @@ drop table if exists tbl_work_file cascade;
 create table tbl_work_file (
     id           bigint generated always as identity primary key,
     work_id      bigint       not null,
-    file_url     varchar(255) not null,
+    file_url     text         not null,
     file_type    varchar(255)  not null,
     file_size    int      null,
     width        int      null,
@@ -21,7 +21,7 @@ create table tbl_work_file (
 comment on table tbl_work_file is '작품 파일';
 comment on column tbl_work_file.id is 'PK';
 comment on column tbl_work_file.work_id is '작품 FK';
-comment on column tbl_work_file.file_url is '파일 URL (S3 등)';
+comment on column tbl_work_file.file_url is '파일 URL 또는 data URL';
 comment on column tbl_work_file.file_type is '파일 타입 (IMAGE / VIDEO / THUMBNAIL)';
 comment on column tbl_work_file.file_size is '파일 크기 (bytes)';
 comment on column tbl_work_file.width is '이미지 너비 (px)';

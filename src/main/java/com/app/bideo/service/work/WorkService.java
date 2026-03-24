@@ -1,5 +1,6 @@
 package com.app.bideo.service.work;
 
+import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.domain.work.WorkFileVO;
 import com.app.bideo.domain.work.WorkTagVO;
@@ -17,26 +18,22 @@ import com.app.bideo.repository.work.WorkDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(rollbackFor = Exception.class)
 public class WorkService {
-
-    private static final String WORK_UPLOAD_DIR = "C:/Users/chanh/Desktop/gb_jch/spring/workspace/bideo/uploads/work";
 
     private final WorkDAO workDAO;
     private final GalleryDAO galleryDAO;
@@ -117,8 +114,8 @@ public class WorkService {
 
     // 수정 폼 요청 기준으로 작품과 연결 정보를 다시 구성한다.
     public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO, MultipartFile mediaFile) {
-        workDAO.findById(id).orElseThrow(() -> new IllegalArgumentException("work not found"));
         Long resolvedMemberId = resolveMemberId(memberId);
+        validateWorkOwner(id, resolvedMemberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
         Long previousGalleryId = galleryDAO.findGalleryIdByWorkId(id).orElse(null);
 
@@ -186,10 +183,19 @@ public class WorkService {
 
     // 파일/태그 연결을 먼저 정리하고 작품을 soft delete 한다.
     public void delete(Long id) {
-        workDAO.findById(id).orElseThrow(() -> new IllegalArgumentException("work not found"));
+        Long resolvedMemberId = resolveMemberId(null);
+        validateWorkOwner(id, resolvedMemberId);
         workDAO.deleteFilesByWorkId(id);
         workDAO.deleteTagsByWorkId(id);
         workDAO.delete(id);
+    }
+
+    private void validateWorkOwner(Long workId, Long memberId) {
+        WorkDTO work = workDAO.findById(workId)
+                .orElseThrow(() -> new IllegalArgumentException("work not found"));
+        if (!memberId.equals(work.getMemberId())) {
+            throw new IllegalStateException("forbidden");
+        }
     }
 
     // 요청 DTO의 파일 목록을 work_file 테이블 구조로 저장한다.
@@ -293,31 +299,29 @@ public class WorkService {
             return memberId;
         }
 
-        return workDAO.findFirstMemberId()
-                .orElseThrow(() -> new IllegalStateException("no member available"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            return userDetails.getId();
+        }
+
+        throw new IllegalStateException("login required");
     }
 
-    // 업로드한 파일을 서버 디스크에 저장하고 접근 가능한 URL을 DB에 남긴다.
+    // 업로드한 파일을 data URL 형태로 DB에 직접 저장한다.
     private void saveMediaFile(Long workId, MultipartFile mediaFile) {
         if (mediaFile == null || mediaFile.isEmpty()) {
             return;
         }
 
         try {
-            Path uploadDir = Paths.get(WORK_UPLOAD_DIR);
-            Files.createDirectories(uploadDir);
-
-            String originalName = mediaFile.getOriginalFilename() != null ? mediaFile.getOriginalFilename() : "media_file";
-            String savedName = UUID.randomUUID() + "_" + originalName.replace(" ", "_");
-            Path savedPath = uploadDir.resolve(savedName);
-
-            Files.copy(mediaFile.getInputStream(), savedPath, StandardCopyOption.REPLACE_EXISTING);
+            String contentType = mediaFile.getContentType() != null ? mediaFile.getContentType() : "application/octet-stream";
+            String base64 = Base64.getEncoder().encodeToString(mediaFile.getBytes());
 
             workDAO.saveFile(
                     WorkFileVO.builder()
                             .workId(workId)
-                            .fileUrl("/uploads/work/" + savedName)
-                            .fileType(mediaFile.getContentType() != null ? mediaFile.getContentType() : "application/octet-stream")
+                            .fileUrl("data:" + contentType + ";base64," + base64)
+                            .fileType(contentType)
                             .fileSize((int) mediaFile.getSize())
                             .sortOrder(0)
                             .build()

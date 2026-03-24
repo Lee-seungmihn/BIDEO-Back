@@ -1,7 +1,10 @@
 package com.app.bideo.mapper.gallery;
 
+import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
+import com.app.bideo.dto.interaction.CommentResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,6 +17,12 @@ public interface GalleryMapper {
 
     List<GalleryListResponseDTO> selectGalleryListByMemberId(@Param("memberId") Long memberId);
 
+    Long selectGalleryMemberId(@Param("id") Long id);
+
+    int updateGallery(@Param("id") Long id, @Param("gallery") GalleryUpdateRequestDTO galleryUpdateRequestDTO);
+
+    int softDeleteGallery(@Param("id") Long id);
+
     void insertGalleryWork(@Param("galleryId") Long galleryId, @Param("workId") Long workId);
 
     int deleteGalleryWorkByWorkId(@Param("workId") Long workId);
@@ -21,4 +30,10 @@ public interface GalleryMapper {
     Long selectGalleryIdByWorkId(@Param("workId") Long workId);
 
     void refreshGalleryWorkCount(@Param("galleryId") Long galleryId);
+
+    void insertGalleryComment(CommentVO commentVO);
+
+    int increaseGalleryCommentCount(@Param("galleryId") Long galleryId);
+
+    List<CommentResponseDTO> selectGalleryCommentsByGalleryId(@Param("galleryId") Long galleryId);
 }
