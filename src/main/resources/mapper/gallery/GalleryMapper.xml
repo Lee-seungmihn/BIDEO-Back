@@ -138,6 +138,29 @@
         order by c.created_datetime asc, c.id asc
     </select>
 
+    <select id="selectGalleryDetail" resultType="GalleryDetailResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            m.nickname as member_nickname,
+            g.title,
+            g.description,
+            g.cover_image,
+            g.allow_comment,
+            g.show_similar,
+            g.work_count,
+            g.like_count,
+            g.comment_count,
+            g.view_count,
+            g.status,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.id = #{id}
+          and g.deleted_datetime is null
+          and g.status != 'DELETED'
+    </select>
+
     <select id="selectRecommendedGalleries" resultType="GalleryListResponseDTO">
         select
             g.id,

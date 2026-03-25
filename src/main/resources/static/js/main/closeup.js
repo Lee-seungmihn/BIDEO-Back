@@ -695,12 +695,75 @@ window.addEventListener('load', () => {
     }
   });
 
+  async function openGalleryDetail(galleryId) {
+    try {
+      const res = await fetch('/api/galleries/' + galleryId);
+      if (!res.ok) throw new Error('API error: ' + res.status);
+      const gallery = await res.json();
+
+      const closeupView = document.getElementById('closeupView');
+      const closeupImage = closeupView.querySelector('.closeup__image');
+      const closeupTitle = closeupView.querySelector('.closeup__title');
+      const closeupDescription = closeupView.querySelector('.closeup__description-text');
+      const creatorAvatar = closeupView.querySelector('.closeup__creator-avatar');
+      const creatorName = closeupView.querySelector('.closeup__creator-name');
+      const creatorHandle = closeupView.querySelector('.closeup__creator-handle');
+      const statCount = closeupView.querySelector('.closeup__stat-count');
+      const imageWrap = closeupView.querySelector('.closeup__image-wrap');
+
+      activeCloseupPinId = 'gallery-' + galleryId;
+      resetCloseupActionState(closeupView);
+
+      closeupImage.src = gallery.coverImage || '/images/BIDEO_LOGO/BIDEO_favicon.png';
+      closeupImage.alt = gallery.title || '';
+      closeupTitle.textContent = gallery.title || '';
+      closeupDescription.textContent = gallery.description || '';
+
+      const authorName = gallery.memberNickname || '크리에이터';
+      const avatarFallback = createAvatarDataUri(authorName, gallery.id || 0);
+      creatorAvatar.onerror = function() {
+        this.onerror = null;
+        this.src = avatarFallback;
+      };
+      creatorAvatar.src = avatarFallback;
+      creatorAvatar.alt = authorName;
+      creatorName.textContent = authorName;
+      creatorHandle.textContent = '';
+      statCount.textContent = String(gallery.likeCount || 0);
+      imageWrap.style.aspectRatio = '16 / 9';
+
+      const badgeContainer = closeupView.querySelector('.closeup__creator-badges');
+      badgeContainer.innerHTML = '';
+
+      if (!window.isCloseupOpen) {
+        savedScrollY = window.scrollY;
+        history.pushState({ closeup: true }, '');
+      } else {
+        history.replaceState({ closeup: true }, '');
+      }
+
+      document.body.classList.add('closeup-open');
+      closeupView.style.display = 'block';
+      window.isCloseupOpen = true;
+      window.scrollTo(0, 0);
+      setupCloseupScrollShadow();
+      initCommentComposer();
+
+      // 관련 작품은 표시하지 않음
+      document.getElementById('closeupRelatedPins').innerHTML = '';
+      document.getElementById('closeupBelowPins').innerHTML = '';
+    } catch (e) {
+      console.error('예술관 상세 조회 실패:', e);
+    }
+  }
+
   window.closeAllMenus = function() {
     document.querySelectorAll('.context-menu').forEach(function(m) { m.remove(); });
     closeCloseupFloatingLayers();
   };
   window.appendCloseupPins = appendCloseupPins;
   window.closeCloseupView = closeCloseupView;
+  window.openGalleryDetail = openGalleryDetail;
 });
 
 

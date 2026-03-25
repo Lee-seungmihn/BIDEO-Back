@@ -5,8 +5,8 @@ server:
       tracking-modes: cookie
   ssl:
     enabled: true
-    certificate: classpath:key/bideo+4.pem
-    certificate-private-key: classpath:key/bideo+4-key.pem
+    certificate: classpath:key/bideo+3.pem
+    certificate-private-key: classpath:key/bideo+3-key.pem
 
 spring:
   config:

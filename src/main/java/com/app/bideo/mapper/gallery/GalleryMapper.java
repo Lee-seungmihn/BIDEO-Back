@@ -2,6 +2,7 @@ package com.app.bideo.mapper.gallery;
 
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
+import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
@@ -14,6 +15,8 @@ import java.util.List;
 public interface GalleryMapper {
 
     void insertGallery(GalleryCreateRequestDTO galleryCreateRequestDTO);
+
+    GalleryDetailResponseDTO selectGalleryDetail(@Param("id") Long id);
 
     List<GalleryListResponseDTO> selectGalleryListByMemberId(@Param("memberId") Long memberId);
 

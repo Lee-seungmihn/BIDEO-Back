@@ -355,6 +355,15 @@ window.addEventListener('load', () => {
       }
       const item = e.target.closest('.search-suggest__item');
       if (!item) return;
+      const galleryId = item.getAttribute('data-gallery-id');
+      if (galleryId) {
+        hideSearchSuggestions();
+        searchInput.blur();
+        if (typeof window.openGalleryDetail === 'function') {
+          window.openGalleryDetail(galleryId);
+        }
+        return;
+      }
       const text = item.querySelector('.search-suggest__text');
       if (text) {
         searchInput.value = text.textContent;
