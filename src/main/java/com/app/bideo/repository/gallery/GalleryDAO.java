@@ -106,4 +106,9 @@ public class GalleryDAO {
     public int findLikeCount(Long galleryId) {
         return Optional.ofNullable(galleryMapper.selectGalleryLikeCount(galleryId)).orElse(0);
     }
+
+    public List<GalleryListResponseDTO> findRecommended() {
+        return galleryMapper.selectRecommendedGalleries();
+    }
+
 }

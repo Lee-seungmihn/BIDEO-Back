@@ -56,4 +56,6 @@ public interface GalleryMapper {
 
     Integer selectGalleryLikeCount(@Param("galleryId") Long galleryId);
 
+    List<GalleryListResponseDTO> selectRecommendedGalleries();
+
 }
