@@ -12,6 +12,7 @@ let currentMemberId = null;
 let workEditTags = [];
 let workEditSelectedFile = null;
 let workEditExistingMediaUrl = null;
+let galleryEditTags = [];
 let galleryEditSelectedFile = null;
 let galleryEditExistingCoverUrl = null;
 let selectedShareRecipients = [];
@@ -444,9 +445,13 @@ async function renderWorkDetailModal(work) {
   priceEl.style.display = shouldShowPrice ? 'block' : 'none';
 
   const tagsEl = document.getElementById('workDetailTags');
-  const tags = (work.tags || []).map((tag) => `#${tag.tagName}`).join(' ');
-  tagsEl.textContent = tags;
-  tagsEl.style.display = tags ? 'block' : 'none';
+  const tags = (work.tags || [])
+    .map((tag) => String(tag?.tagName || '').trim())
+    .filter(Boolean);
+  tagsEl.innerHTML = tags
+    .map((tagName) => `<span class="work-detail-tag-chip">#${escapeHtml(tagName.replace(/^#/, ''))}</span>`)
+    .join('');
+  tagsEl.style.display = tags.length ? 'flex' : 'none';
   const likeCountElement = document.getElementById('workDetailLikeCount');
   if (likeCountElement) {
     likeCountElement.textContent = formatLikeCountLabel(work.likeCount ?? 0);
@@ -1057,7 +1062,8 @@ async function openGalleryCloseupModal(trigger) {
     likeCount,
     viewCount,
     cover,
-    isLiked
+    isLiked,
+    tags: []
   };
 
   let detail = null;
@@ -1077,10 +1083,8 @@ async function openGalleryCloseupModal(trigger) {
       .map((tag) => String(tag?.tagName || '').trim())
       .filter(Boolean)
     : [];
-  const fallbackProfileTags = Array.from(document.querySelectorAll('.profile-tag'))
-    .map((element) => String(element.textContent || '').trim())
-    .filter(Boolean);
-  const visibleTags = normalizedTags.length ? normalizedTags : fallbackProfileTags;
+  const visibleTags = normalizedTags;
+  currentGalleryDetail.tags = normalizedTags;
 
   if (titleElement) titleElement.textContent = title;
   if (ownerElement) ownerElement.textContent = owner;
@@ -1286,12 +1290,53 @@ function populateGalleryEditModal(gallery) {
 
   galleryEditSelectedFile = null;
   galleryEditExistingCoverUrl = gallery.cover || null;
+  galleryEditTags = (gallery.tags || []).map((tag) => {
+    const tagName = typeof tag === 'string' ? tag : tag?.tagName;
+    return tagName ? `#${String(tagName).replace(/^#/, '').trim()}` : '';
+  }).filter(Boolean);
+  renderGalleryEditTags();
 
   if (galleryEditExistingCoverUrl) {
     showGalleryEditPreviewFromUrl(galleryEditExistingCoverUrl);
   } else {
     resetGalleryEditPreview();
   }
+}
+
+function renderGalleryEditTags() {
+  const tagWrapper = document.getElementById('galleryEditTagWrapper');
+  const tagInput = document.getElementById('galleryEditTagInput');
+  if (!tagWrapper || !tagInput) return;
+
+  tagWrapper.querySelectorAll('.work-edit-modal__tag-item').forEach((element) => element.remove());
+
+  galleryEditTags.forEach((tag, index) => {
+    const tagItem = document.createElement('span');
+    tagItem.className = 'work-edit-modal__tag-item';
+    tagItem.innerHTML = `${tag}<button class="work-edit-modal__tag-remove" type="button" data-idx="${index}">&times;</button>`;
+    tagWrapper.insertBefore(tagItem, tagInput);
+  });
+
+  const label = tagWrapper.querySelector('label');
+  if (label) {
+    label.textContent = `태그된 주제 (${galleryEditTags.length}개)`;
+  }
+}
+
+function addGalleryEditTag(value) {
+  let normalized = String(value || '').trim();
+  if (!normalized) return;
+  if (!normalized.startsWith('#')) {
+    normalized = `#${normalized}`;
+  }
+  if (galleryEditTags.includes(normalized)) return;
+  galleryEditTags.push(normalized);
+  renderGalleryEditTags();
+}
+
+function removeGalleryEditTag(index) {
+  galleryEditTags.splice(index, 1);
+  renderGalleryEditTags();
 }
 
 async function submitGalleryEdit() {
@@ -1311,6 +1356,11 @@ async function submitGalleryEdit() {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('description', description);
+  if (galleryEditTags.length) {
+    galleryEditTags.forEach((tag) => formData.append('tagNames', tag));
+  } else {
+    formData.append('tagNames', '');
+  }
   if (galleryEditSelectedFile) {
     formData.append('coverFile', galleryEditSelectedFile);
   }
@@ -1734,6 +1784,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const workDetailCommentSubmit = document.getElementById('workDetailCommentSubmit');
   const galleryEditUploadArea = document.getElementById('galleryEditUploadArea');
   const galleryEditFileInput = document.getElementById('galleryEditFileInput');
+  const galleryEditTagInput = document.getElementById('galleryEditTagInput');
+  const galleryEditTagWrapper = document.getElementById('galleryEditTagWrapper');
   const galleryCloseupCommentInput = document.getElementById('galleryCloseupCommentInput');
   const galleryCloseupCommentSubmit = document.getElementById('galleryCloseupCommentSubmit');
   const galleryCloseupLikeButton = document.getElementById('galleryCloseupLikeButton');
@@ -2051,6 +2103,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       galleryEditSelectedFile = file;
       showGalleryEditPreviewFile(file);
+    });
+  }
+
+  if (galleryEditTagInput) {
+    galleryEditTagInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addGalleryEditTag(galleryEditTagInput.value);
+        galleryEditTagInput.value = '';
+      }
+
+      if (event.key === 'Backspace' && !galleryEditTagInput.value && galleryEditTags.length) {
+        removeGalleryEditTag(galleryEditTags.length - 1);
+      }
+    });
+  }
+
+  if (galleryEditTagWrapper) {
+    galleryEditTagWrapper.addEventListener('click', (event) => {
+      if (event.target.classList.contains('work-edit-modal__tag-remove')) {
+        removeGalleryEditTag(Number(event.target.dataset.idx));
+        return;
+      }
+      galleryEditTagInput?.focus();
     });
   }
 });
