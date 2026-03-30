@@ -39,28 +39,28 @@ window.addEventListener('load', () => {
   let hasMorePages = true;
   let currentKeyword = '';
 
-  async function fetchWorks(page, size) {
-    let url = '/api/works?page=' + page + '&size=' + size;
+  async function fetchGalleries(page, size) {
+    let url = '/api/galleries?page=' + page + '&size=' + size;
     if (currentKeyword) url += '&keyword=' + encodeURIComponent(currentKeyword);
     const res = await fetch(url);
     if (!res.ok) throw new Error('API error: ' + res.status);
     return res.json();
   }
 
-  function mapWorkToPin(work) {
+  function mapGalleryToPin(gallery) {
     return {
-      id: 'work-' + work.id,
-      workId: work.id,
-      imageUrl: work.thumbnailUrl || '/images/BIDEO_LOGO/BIDEO_favicon.png',
-      width: work.thumbnailWidth || 400,
-      height: work.thumbnailHeight || 300,
-      title: work.title || '',
-      description: work.description || '',
+      id: 'gallery-' + gallery.id,
+      galleryId: gallery.id,
+      imageUrl: gallery.coverImage || '/images/BIDEO_LOGO/BIDEO_favicon.png',
+      width: 400,
+      height: 300,
+      title: gallery.title || '',
+      description: gallery.description || '',
       author: {
-        name: work.memberNickname || '크리에이터',
-        avatar: work.memberProfileImage || LOCAL_PROFILE_IMAGE
+        name: gallery.memberNickname || '크리에이터',
+        avatar: LOCAL_PROFILE_IMAGE
       },
-      saves: work.saveCount || 0
+      saves: gallery.likeCount || 0
     };
   }
 
@@ -570,8 +570,8 @@ window.addEventListener('load', () => {
           return;
         }
       } else {
-        const data = await fetchWorks(currentPage, BATCH_SIZE);
-        const pins = (data.content || []).map(mapWorkToPin);
+        const data = await fetchGalleries(currentPage, BATCH_SIZE);
+        const pins = (data.content || []).map(mapGalleryToPin);
         pins.forEach(function (p) { pinStore.set(p.id, p); });
         renderPins(pins);
         currentPage++;
@@ -678,9 +678,9 @@ window.addEventListener('load', () => {
   // ─── 전역 공유 (closeup.js에서 사용) ─────────────────
   window.pinStore = pinStore;
   window.BATCH_SIZE = BATCH_SIZE;
-  window.mapWorkToPin = mapWorkToPin;
+  window.mapGalleryToPin = mapGalleryToPin;
   window.createArtGalleryCardHTML = createArtGalleryCardHTML;
-  window.fetchWorks = fetchWorks;
+  window.fetchGalleries = fetchGalleries;
 
   // ─── 초기화 ─────────────────────────────────────────
   if (!IS_LOGGED_IN) initGuestMode();

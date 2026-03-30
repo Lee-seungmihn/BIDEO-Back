@@ -1,7 +1,10 @@
 package com.app.bideo.controller.gallery;
 
+import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
+import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
 import com.app.bideo.dto.interaction.CommentCreateRequestDTO;
@@ -28,6 +31,11 @@ import java.util.List;
 public class GalleryAPIController {
 
     private final GalleryService galleryService;
+
+    @GetMapping
+    public PageResponseDTO<GalleryListResponseDTO> list(@ModelAttribute GallerySearchDTO searchDTO) {
+        return galleryService.getGalleryList(searchDTO);
+    }
 
     @GetMapping("/{id}")
     public GalleryDetailResponseDTO detail(@PathVariable Long id) {

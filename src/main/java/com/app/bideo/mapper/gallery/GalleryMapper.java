@@ -5,6 +5,7 @@ import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -66,6 +67,10 @@ public interface GalleryMapper {
     int decreaseGalleryLikeCount(@Param("galleryId") Long galleryId);
 
     Integer selectGalleryLikeCount(@Param("galleryId") Long galleryId);
+
+    List<GalleryListResponseDTO> selectGalleryList(GallerySearchDTO searchDTO);
+
+    int selectGalleryCount(GallerySearchDTO searchDTO);
 
     List<GalleryListResponseDTO> selectRecommendedGalleries();
 
