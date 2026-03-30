@@ -4,6 +4,7 @@ import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.domain.member.MemberVO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.service.gallery.GalleryService;
+import com.app.bideo.service.member.FollowService;
 import com.app.bideo.service.work.WorkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ public class ProfileController {
 
     private final WorkService workService;
     private final GalleryService galleryService;
+    private final FollowService followService;
     private final MemberRepository memberRepository; // 이승민| 프로필 닉네임 경로 적용으로 인한 추가
 
     @GetMapping
@@ -53,6 +55,9 @@ public class ProfileController {
     private String renderProfilePage(MemberVO profileMember, Long galleryId,
                                      CustomUserDetails userDetails, Model model) {
         boolean isOwner = userDetails != null && profileMember.getId().equals(userDetails.getId());
+        boolean isFollowing = userDetails != null
+                && !isOwner
+                && followService.isFollowing(userDetails.getId(), profileMember.getId());
         model.addAttribute("works", workService.getProfileWorks(profileMember.getId(), galleryId));
         model.addAttribute("galleries", galleryService.getProfileGalleries(profileMember.getId()));
         model.addAttribute("selectedGalleryId", galleryId);
@@ -60,6 +65,7 @@ public class ProfileController {
         model.addAttribute("profileMember", profileMember); // 이승민| 프로필 상단 실데이터 노출로 인한 추가
         model.addAttribute("profileNickname", profileMember.getNickname()); // 이승민| 프로필 닉네임 경로 적용으로 인한 수정
         model.addAttribute("isOwner", isOwner); // 이승민| 프로필 닉네임 경로 적용으로 인한 추가
+        model.addAttribute("isFollowing", isFollowing);
         return "profile/profile";
     }
 }

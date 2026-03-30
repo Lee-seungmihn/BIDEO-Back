@@ -16,6 +16,7 @@ import com.app.bideo.repository.interaction.BookmarkDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.interaction.CommentService;
 import com.app.bideo.service.common.S3FileService;
+import com.app.bideo.service.member.FollowService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ public class GalleryService {
     private final WorkDAO workDAO;
     private final BookmarkDAO bookmarkDAO;
     private final CommentService commentService;
+    private final FollowService followService;
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
@@ -105,6 +107,12 @@ public class GalleryService {
         Long memberId = resolveAuthenticatedMemberId();
         detail.setIsLiked(memberId != null && galleryDAO.existsLike(memberId, id));
         detail.setIsBookmarked(memberId != null && bookmarkDAO.exists(memberId, "GALLERY", id));
+        detail.setIsFollowing(
+                memberId != null
+                        && detail.getMemberId() != null
+                        && !memberId.equals(detail.getMemberId())
+                        && followService.isFollowing(memberId, detail.getMemberId())
+        );
         return detail;
     }
 

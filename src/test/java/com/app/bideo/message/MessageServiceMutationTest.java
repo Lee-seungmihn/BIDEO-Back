@@ -5,6 +5,7 @@ import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.repository.message.MessageDAO;
 import com.app.bideo.repository.message.MessageRoomDAO;
 import com.app.bideo.service.message.MessageService;
+import com.app.bideo.service.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,6 +28,7 @@ class MessageServiceMutationTest {
     private MessageRoomDAO messageRoomDAO;
     private MemberRepository memberRepository;
     private SimpMessagingTemplate messagingTemplate;
+    private NotificationService notificationService;
     private MessageService messageService;
 
     @BeforeEach
@@ -35,7 +37,8 @@ class MessageServiceMutationTest {
         messageRoomDAO = Mockito.mock(MessageRoomDAO.class);
         memberRepository = Mockito.mock(MemberRepository.class);
         messagingTemplate = Mockito.mock(SimpMessagingTemplate.class);
-        messageService = new MessageService(messageDAO, messageRoomDAO, memberRepository, messagingTemplate);
+        notificationService = Mockito.mock(NotificationService.class);
+        messageService = new MessageService(messageDAO, messageRoomDAO, memberRepository, messagingTemplate, notificationService);
     }
 
     @Test
@@ -79,5 +82,38 @@ class MessageServiceMutationTest {
 
         assertEquals("삭제된 메시지에는 좋아요를 누를 수 없습니다.", exception.getMessage());
         verify(messageDAO, never()).saveLike(2L, 11L);
+    }
+
+    @Test
+    void toggleMessageLikeCreatesMessageNotificationForReceiver() {
+        when(messageRoomDAO.isMember(5L, 2L)).thenReturn(true);
+        when(messageDAO.findById(12L)).thenReturn(Optional.of(
+                MessageVO.builder()
+                        .id(12L)
+                        .messageRoomId(5L)
+                        .senderId(7L)
+                        .content("원본")
+                        .build()
+        ));
+        when(messageDAO.existsLike(2L, 12L)).thenReturn(false);
+        when(messageDAO.findResponseById(12L, 2L)).thenReturn(Optional.of(
+                com.app.bideo.dto.message.MessageResponseDTO.builder()
+                        .id(12L)
+                        .messageRoomId(5L)
+                        .likeCount(1)
+                        .isLiked(true)
+                        .build()
+        ));
+
+        messageService.toggleMessageLike(5L, 12L, 2L);
+
+        verify(notificationService).createNotification(
+                7L,
+                2L,
+                "LIKE",
+                "MESSAGE",
+                12L,
+                "메시지에 좋아요를 눌렀습니다."
+        );
     }
 }

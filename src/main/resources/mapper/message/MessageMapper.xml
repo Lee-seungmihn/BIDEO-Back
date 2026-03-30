@@ -157,8 +157,7 @@
     <update id="increaseMessageLikeCount">
         UPDATE tbl_message
         SET
-            like_count = COALESCE(like_count, 0) + 1,
-            updated_datetime = now()
+            like_count = COALESCE(like_count, 0) + 1
         WHERE id = #{messageId}
           AND deleted_datetime IS NULL
     </update>
@@ -166,8 +165,7 @@
     <update id="decreaseMessageLikeCount">
         UPDATE tbl_message
         SET
-            like_count = GREATEST(COALESCE(like_count, 0) - 1, 0),
-            updated_datetime = now()
+            like_count = GREATEST(COALESCE(like_count, 0) - 1, 0)
         WHERE id = #{messageId}
           AND deleted_datetime IS NULL
     </update>

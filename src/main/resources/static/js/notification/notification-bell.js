@@ -65,6 +65,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function markNotificationAsRead(item) {
+        if (!item || !item.classList.contains("notification-item--unread")) {
+            return Promise.resolve();
+        }
+
+        return fetch("/api/notifications/" + item.dataset.id + "/read", { method: "PATCH" })
+            .then(() => {
+                item.classList.remove("notification-item--unread");
+                updateBadge();
+            })
+            .catch(() => {});
+    }
+
+    function openMessageNotification(item) {
+        const detail = {
+            notificationId: Number(item.dataset.id),
+            messageId: Number(item.dataset.targetId),
+            messageRoomId: Number(item.dataset.messageRoomId)
+        };
+
+        if (!detail.messageId || !detail.messageRoomId) {
+            window.showToast?.("메시지를 찾을 수 없습니다.");
+            return;
+        }
+
+        window.dispatchEvent(new CustomEvent("bideo:open-message-notification", { detail }));
+        isOpen = false;
+        panel.classList.remove("notification-panel--open");
+    }
+
     function getNotiIcon(notiType) {
         switch (notiType) {
             case "COMMENT": return "💬";
@@ -94,6 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return '<div class="notification-item' + unreadClass + '" data-id="' + item.id + '"'
+            + ' data-target-type="' + (item.targetType || '') + '"'
+            + ' data-target-id="' + (item.targetId || '') + '"'
+            + ' data-message-room-id="' + (item.messageRoomId || '') + '"'
             + (url ? ' data-url="' + url + '"' : '') + '>'
             + avatarHTML
             + '<div class="notification-item__body">'
@@ -158,21 +191,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const item = e.target.closest(".notification-item");
             if (item) {
-                const id = item.dataset.id;
                 const url = item.dataset.url;
+                const targetType = item.dataset.targetType;
 
-                if (item.classList.contains("notification-item--unread")) {
-                    fetch("/api/notifications/" + id + "/read", { method: "PATCH" })
-                        .then(() => {
-                            item.classList.remove("notification-item--unread");
-                            updateBadge();
-                        })
-                        .catch(() => {});
-                }
+                markNotificationAsRead(item).then(() => {
+                    if (targetType === "MESSAGE") {
+                        openMessageNotification(item);
+                        return;
+                    }
 
-                if (url) {
-                    window.location.href = url;
-                }
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
             }
         });
 

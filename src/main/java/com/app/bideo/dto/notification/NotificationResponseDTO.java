@@ -16,6 +16,7 @@ public class NotificationResponseDTO {
     private String notiType;
     private String targetType;
     private Long targetId;
+    private Long messageRoomId;
     private String message;
     private Boolean isRead;
     private LocalDateTime createdDatetime;

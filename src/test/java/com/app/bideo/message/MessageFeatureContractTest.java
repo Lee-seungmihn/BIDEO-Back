@@ -44,6 +44,14 @@ class MessageFeatureContractTest {
     }
 
     @Test
+    void notificationResponseDtoExposesMessageRoomMetadata() throws Exception {
+        Field field = Class.forName("com.app.bideo.dto.notification.NotificationResponseDTO")
+                .getDeclaredField("messageRoomId");
+
+        assertNotNull(field);
+    }
+
+    @Test
     void messageApiControllerExposesMutationEndpoints() throws Exception {
         Method updateMethod = Arrays.stream(MessageAPIController.class.getDeclaredMethods())
                 .filter(method -> method.getName().equals("updateMessage"))

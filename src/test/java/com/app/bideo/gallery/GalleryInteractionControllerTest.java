@@ -41,6 +41,9 @@ class GalleryInteractionControllerTest {
                         .title("봄 전시")
                         .isLiked(true)
                         .isBookmarked(false)
+                        .isFollowing(true)
+                        .memberId(3L)
+                        .memberNickname("curator")
                         .commentCount(2)
                         .build()
         );
@@ -73,6 +76,9 @@ class GalleryInteractionControllerTest {
                 .andExpect(jsonPath("$.title").value("봄 전시"))
                 .andExpect(jsonPath("$.isLiked").value(true))
                 .andExpect(jsonPath("$.isBookmarked").value(false))
+                .andExpect(jsonPath("$.isFollowing").value(true))
+                .andExpect(jsonPath("$.memberId").value(3))
+                .andExpect(jsonPath("$.memberNickname").value("curator"))
                 .andExpect(jsonPath("$.commentCount").value(2));
 
         mockMvc.perform(get("/api/galleries/7/comments"))

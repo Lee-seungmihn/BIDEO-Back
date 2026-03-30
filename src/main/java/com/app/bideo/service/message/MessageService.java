@@ -11,6 +11,7 @@ import com.app.bideo.dto.message.MessageRoomResponseDTO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.repository.message.MessageDAO;
 import com.app.bideo.repository.message.MessageRoomDAO;
+import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class MessageService {
     private final MessageRoomDAO messageRoomDAO;
     private final MemberRepository memberRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<MessageRoomResponseDTO> getMyRooms(Long memberId) {
@@ -143,6 +145,10 @@ public class MessageService {
         } else {
             messageDAO.saveLike(memberId, messageId);
             messageDAO.increaseLikeCount(messageId);
+            notificationService.createNotification(
+                    message.getSenderId(), memberId, "LIKE", MESSAGE_TARGET_TYPE, messageId,
+                    "메시지에 좋아요를 눌렀습니다."
+            );
         }
 
         MessageResponseDTO response = loadMessageResponseOrThrow(messageId, memberId);

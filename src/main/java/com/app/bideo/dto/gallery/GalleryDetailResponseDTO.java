@@ -29,5 +29,6 @@ public class GalleryDetailResponseDTO {
     private List<WorkListResponseDTO> works;
     private Boolean isLiked;
     private Boolean isBookmarked;
+    private Boolean isFollowing;
     private LocalDateTime createdDatetime;
 }

@@ -1,21 +1,20 @@
 package com.app.bideo.gallery;
 
-import com.app.bideo.dto.gallery.SearchGalleryCoverDataDTO;
-import com.app.bideo.dto.gallery.SearchGalleryCoverResponseDTO;
 import com.app.bideo.repository.gallery.GalleryDAO;
+import com.app.bideo.repository.interaction.BookmarkDAO;
 import com.app.bideo.repository.work.WorkDAO;
+import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.gallery.GalleryService;
+import com.app.bideo.service.interaction.CommentService;
+import com.app.bideo.service.member.FollowService;
+import com.app.bideo.service.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 class GalleryServiceSearchTest {
@@ -23,38 +22,17 @@ class GalleryServiceSearchTest {
     private GalleryDAO galleryDAO;
     private GalleryService galleryService;
 
-<<<<<<< HEAD
-//    @BeforeEach
-//    void setUp() {
-//        galleryDAO = Mockito.mock(GalleryDAO.class);
-//        galleryService = new GalleryService(galleryDAO, Mockito.mock(WorkDAO.class));
-//    }
-
-//    @Test
-//    void searchGalleryCoverDecodesStoredDataUri() {
-//        byte[] imageBytes = "thumb-image".getBytes(StandardCharsets.UTF_8);
-//        given(galleryDAO.findSearchGalleryCover(5L)).willReturn(Optional.of(
-//                SearchGalleryCoverDataDTO.builder()
-//                        .coverImage("data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes))
-//                        .build()
-//        ));
-//
-//        SearchGalleryCoverResponseDTO response = galleryService.getSearchGalleryCover(5L);
-//
-//        assertNotNull(response);
-//        assertEquals("image/png", response.getContentType());
-//        assertEquals("public, max-age=300", response.getCacheControl());
-//        assertArrayEquals(imageBytes, response.getBytes());
-//    }
-=======
     @BeforeEach
     void setUp() {
         galleryDAO = Mockito.mock(GalleryDAO.class);
         galleryService = new GalleryService(
                 galleryDAO,
                 Mockito.mock(WorkDAO.class),
+                Mockito.mock(BookmarkDAO.class),
                 Mockito.mock(CommentService.class),
-                Mockito.mock(NotificationService.class)
+                Mockito.mock(FollowService.class),
+                Mockito.mock(NotificationService.class),
+                Mockito.mock(S3FileService.class)
         );
     }
 
@@ -64,5 +42,4 @@ class GalleryServiceSearchTest {
 
         assertThrows(IllegalArgumentException.class, () -> galleryService.getGalleryDetail(5L));
     }
->>>>>>> admin
 }

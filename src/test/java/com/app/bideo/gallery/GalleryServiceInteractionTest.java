@@ -7,6 +7,7 @@ import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.gallery.GalleryService;
 import com.app.bideo.service.interaction.CommentService;
+import com.app.bideo.service.member.FollowService;
 import com.app.bideo.service.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,17 +24,20 @@ class GalleryServiceInteractionTest {
 
     private GalleryDAO galleryDAO;
     private BookmarkDAO bookmarkDAO;
+    private FollowService followService;
     private GalleryService galleryService;
 
     @BeforeEach
     void setUp() {
         galleryDAO = Mockito.mock(GalleryDAO.class);
         bookmarkDAO = Mockito.mock(BookmarkDAO.class);
+        followService = Mockito.mock(FollowService.class);
         galleryService = new GalleryService(
                 galleryDAO,
                 Mockito.mock(WorkDAO.class),
                 bookmarkDAO,
                 Mockito.mock(CommentService.class),
+                followService,
                 Mockito.mock(NotificationService.class),
                 Mockito.mock(S3FileService.class)
         );

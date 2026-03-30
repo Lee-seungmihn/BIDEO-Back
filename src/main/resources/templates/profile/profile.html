@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/css/profile/profile.css">
   
 </head>
-<body th:attr="data-owner=${isOwner}"> <!-- 닉네임 경로에서도 본인/타인 프로필 UI가 갈리도록 서버값 사용 -->
+<body th:attr="data-owner=${isOwner},data-profile-member-id=${profileMember.id},data-is-following=${isFollowing}"> <!-- 닉네임 경로에서도 본인/타인 프로필 UI가 갈리도록 서버값 사용 -->
 <!-- ========== MAIN ========== -->
 <input type="hidden" id="memberNo" value="">
 <div class="main-content">
@@ -56,7 +56,10 @@
   </div>
   <!-- Action Buttons: Viewer -->
   <div class="action-buttons viewer-only">
-    <button class="btn-primary profile-action-btn" id="followBtn"
+    <button class="profile-action-btn"
+            id="followBtn"
+            th:classappend="${isFollowing} ? ' btn-secondary btn-secondary--active is-following' : ' btn-primary'"
+            th:text="${isFollowing} ? '팔로잉' : '팔로우'"
             onclick="toggleFollow()">팔로우</button>
     <a href="#" class="btn-secondary profile-action-btn" onclick="event.preventDefault(); document.querySelector('[aria-label=&quot;메시지&quot;]')?.click();">메시지</a>
   </div>

@@ -47,6 +47,7 @@ window.addEventListener('load', () => {
   let isGalleryLikePending = false;
   let isGalleryBookmarkPending = false;
   let isGalleryCommentPending = false;
+  let isGalleryFollowPending = false;
 
   function isGalleryCloseup(pinId) {
     const targetPinId = pinId || activeCloseupPinId;
@@ -190,6 +191,44 @@ window.addEventListener('load', () => {
     }
   }
 
+  function updateCloseupFollowUi(isFollowing) {
+    const closeupView = document.getElementById('closeupView');
+    const followBtn = closeupView ? closeupView.querySelector('.closeup__creator-follow') : null;
+    if (!followBtn) return;
+
+    const following = Boolean(isFollowing);
+    followBtn.classList.toggle('closeup__creator-follow--following', following);
+    followBtn.textContent = following ? '팔로잉' : '팔로우';
+
+    if (activeGalleryDetail) {
+      activeGalleryDetail.isFollowing = following;
+    }
+  }
+
+  function updateCloseupCommentLikeUi(btn, liked, likeCount) {
+    if (!btn) return;
+    const countEl = btn.parentElement ? btn.parentElement.querySelector('.closeup__comment-like-count') : null;
+    btn.classList.toggle('closeup__comment-like-btn--active', Boolean(liked));
+    btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+    const svgPath = btn.querySelector('path');
+    if (svgPath) {
+      svgPath.setAttribute('d', liked ? CLOSEUP_LIKE_FILLED_PATH : CLOSEUP_LIKE_OUTLINE_PATH);
+    }
+    if (countEl) {
+      const normalizedCount = Number(likeCount || 0);
+      countEl.textContent = String(normalizedCount);
+      countEl.style.display = normalizedCount > 0 ? '' : 'none';
+    }
+  }
+
+  function getActiveGalleryProfileUrl() {
+    if (!activeGalleryDetail || !activeGalleryDetail.id || !activeGalleryDetail.memberNickname) {
+      return null;
+    }
+
+    return '/profile/' + encodeURIComponent(activeGalleryDetail.memberNickname) + '?galleryId=' + activeGalleryDetail.id;
+  }
+
   function updateCardBookmarkUi(galleryId, bookmarked) {
     document.querySelectorAll('.art-gallery-card[data-id="gallery-' + galleryId + '"] .art-gallery-card__save-btn')
         .forEach(function(button) {
@@ -220,6 +259,7 @@ window.addEventListener('load', () => {
       const likeCountHtml = likeCount > 0
           ? '<span class="closeup__comment-like-count">' + likeCount + '</span>'
           : '<span class="closeup__comment-like-count" style="display:none;">0</span>';
+      const likeSvgPath = comment.isLiked ? CLOSEUP_LIKE_FILLED_PATH : CLOSEUP_LIKE_OUTLINE_PATH;
 
       return '' +
           '<div class="closeup__comment-item">' +
@@ -231,8 +271,8 @@ window.addEventListener('load', () => {
           '</div>' +
           '<p class="closeup__comment-text">' + escapeCommentHtml(comment.content || '') + '</p>' +
           '<div class="closeup__comment-actions">' +
+          '<button class="closeup__comment-like-btn' + (comment.isLiked ? ' closeup__comment-like-btn--active' : '') + '" type="button" data-action="toggle-comment-like" data-comment-id="' + Number(comment.id || 0) + '" aria-pressed="' + (comment.isLiked ? 'true' : 'false') + '"><svg viewBox="0 0 24 24" width="14" height="14"><path d="' + likeSvgPath + '"/></svg></button>' +
           likeCountHtml +
-          '<button class="closeup__comment-like-btn" type="button" data-action="toggle-comment-like" data-comment-id="' + Number(comment.id || 0) + '">좋아요</button>' +
           '</div>' +
           '</div>' +
           '</div>';
@@ -376,6 +416,12 @@ window.addEventListener('load', () => {
   }
 
   function focusCloseupDetails() {
+    const profileUrl = getActiveGalleryProfileUrl();
+    if (profileUrl) {
+      window.location.href = profileUrl;
+      return;
+    }
+
     const detailSection = document.querySelector('.closeup__title-section');
     if (!detailSection) return;
     detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -383,53 +429,225 @@ window.addEventListener('load', () => {
 
   function toggleCloseupShareMenu(event, btn) {
     event.stopPropagation();
-    if (document.getElementById(CLOSEUP_SHARE_SHEET_ID)) {
-      closeCloseupFloatingLayers();
+    const existing = document.getElementById(CLOSEUP_SHARE_SHEET_ID);
+    if (existing) {
+      existing.remove();
       return;
     }
 
     closeAllMenus();
     btn.classList.add('closeup__icon-btn--active');
-    const rect = btn.getBoundingClientRect();
-    const layer = document.createElement('div');
-    layer.id = CLOSEUP_SHARE_SHEET_ID;
-    layer.className = 'popover-anchor-full closeup-floating-layer';
-    layer.innerHTML =
-        '<div class="closeup-floating-layer__backdrop"></div>' +
-        '<div class="u-box-border">' +
-        '<div>' +
-        '<span data-type="inside" tabindex="0" aria-hidden="true" data-floating-ui-focus-guard="" data-floating-ui-inert=""></span>' +
-        '<div class="u-floating-block u-rounded-400-popover" tabindex="-1" style="position:absolute;left:0;top:0;visibility:visible;outline:none;transform:translate(' + Math.max(16, rect.left - 210) + 'px, ' + Math.max(96, rect.bottom + 12) + 'px);">' +
-        '<div aria-label="메뉴 공유" aria-modal="true" class="u-position-relative u-max-viewport-90 u-bg-elevation u-rounded-400-popover closeup-share-sheet" role="dialog">' +
-        '<div class="closeup-share-sheet__header"><h2 class="closeup-share-sheet__title">공유</h2></div>' +
-        '<div class="closeup-share-sheet__body">' +
-        '<div class="closeup-share-sheet__socials">' +
-        '<div class="closeup-share-sheet__social"><button class="closeup-share-sheet__social-btn" type="button" data-action="copy-closeup-link">링크</button><span>링크 복사</span></div>' +
-        '<div class="closeup-share-sheet__social"><button class="closeup-share-sheet__social-btn closeup-share-sheet__social-btn--dark" type="button">W</button><span>WhatsApp</span></div>' +
-        '<div class="closeup-share-sheet__social"><button class="closeup-share-sheet__social-btn" type="button">M</button><span>메신저</span></div>' +
-        '<div class="closeup-share-sheet__social"><button class="closeup-share-sheet__social-btn" type="button">f</button><span>Facebook</span></div>' +
-        '<div class="closeup-share-sheet__social"><button class="closeup-share-sheet__social-btn closeup-share-sheet__social-btn--dark" type="button">X</button><span>X</span></div>' +
-        '</div>' +
-        '<input class="closeup-share-sheet__search" id="contactSearch" type="search" placeholder="이름 또는 이메일 검색" aria-label="검색 필드">' +
-        '<div class="closeup-share-sheet__contacts">' +
-        '<div class="closeup-share-sheet__contact"><img src="' + LOCAL_PROFILE_IMAGE + '" alt="정찬호"><div class="closeup-share-sheet__contact-copy"><span class="closeup-share-sheet__contact-name">정찬호</span><span class="closeup-share-sheet__contact-handle">@chanho8629</span></div><button class="closeup-share-sheet__send" type="button" data-action="toggle-send">보내기</button></div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<span data-type="inside" tabindex="0" aria-hidden="true" data-floating-ui-focus-guard="" data-floating-ui-inert=""></span>' +
-        '</div>' +
-        '</div>';
 
-    layer.addEventListener('click', function(e) {
-      if (e.target === layer || e.target.classList.contains('closeup-floating-layer__backdrop')) {
-        closeCloseupFloatingLayers();
+    const shareUrl = window.location.origin + (getActiveGalleryProfileUrl() || window.location.pathname);
+    const galleryTitle = (activeGalleryDetail && activeGalleryDetail.title) ? activeGalleryDetail.title.replace(/"/g, '&quot;').replace(/</g, '&lt;') : '예술관';
+    let selectedRecipients = [];
+    let shareSearchTimer = null;
+    let searchCache = [];
+
+    const overlay = document.createElement('div');
+    overlay.id = CLOSEUP_SHARE_SHEET_ID;
+    overlay.className = 'modal-overlay work-share-modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', '공유');
+    overlay.innerHTML =
+      '<div class="work-share-modal">' +
+        '<div class="work-share-modal__header">' +
+          '<div class="work-share-modal__spacer"></div>' +
+          '<h2 class="work-share-modal__title">공유</h2>' +
+          '<button class="work-share-modal__close" type="button" aria-label="닫기">' +
+            '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
+              '<polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>' +
+              '<line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line>' +
+            '</svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="work-share-modal__link-row">' +
+          '<input class="work-share-modal__link-input" type="text" readonly value="' + shareUrl.replace(/"/g, '&quot;') + '">' +
+          '<button class="work-share-modal__link-copy" type="button">복사</button>' +
+        '</div>' +
+        '<div class="work-share-modal__receiver">' +
+          '<label class="work-share-modal__label">받는 사람:</label>' +
+          '<div class="work-share-modal__receiver-body">' +
+            '<div class="work-share-modal__chips"></div>' +
+            '<input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off">' +
+          '</div>' +
+        '</div>' +
+        '<div class="work-share-modal__list"></div>' +
+        '<div class="work-share-modal__footer">' +
+          '<input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off">' +
+          '<button class="work-share-modal__send" type="button">보내기</button>' +
+        '</div>' +
+      '</div>';
+
+    const closeModal = function() {
+      overlay.remove();
+      btn.classList.remove('closeup__icon-btn--active');
+    };
+
+    const escapeHtml = function(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+
+    const chipsContainer = overlay.querySelector('.work-share-modal__chips');
+    const searchInput = overlay.querySelector('.work-share-modal__search');
+    const recipientList = overlay.querySelector('.work-share-modal__list');
+
+    const renderChips = function() {
+      if (!selectedRecipients.length) {
+        chipsContainer.innerHTML = '';
+        return;
       }
+      chipsContainer.innerHTML = selectedRecipients.map(function(r) {
+        return '<div class="work-share-chip">' +
+          '<span class="work-share-chip__text">' + escapeHtml(r.nickname) + '</span>' +
+          '<button class="work-share-chip__remove" type="button" data-share-remove="' + r.id + '" aria-label="' + escapeHtml(r.nickname) + ' 삭제">' +
+            '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">' +
+              '<polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>' +
+              '<line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line>' +
+            '</svg>' +
+          '</button>' +
+        '</div>';
+      }).join('');
+    };
+
+    const renderRecipientList = function() {
+      if (!searchCache.length) {
+        recipientList.innerHTML = '';
+        return;
+      }
+      recipientList.innerHTML = searchCache.map(function(m) {
+        const isSelected = selectedRecipients.some(function(s) { return s.id === m.id; });
+        const avatar = m.profileImage || LOCAL_PROFILE_IMAGE;
+        return '<button class="work-share-recipient' + (isSelected ? ' is-selected' : '') + '" type="button" data-share-recipient="' + m.id + '">' +
+          '<div class="work-share-recipient__main">' +
+            '<div class="work-share-recipient__avatar"><img src="' + escapeHtml(avatar) + '" alt=""></div>' +
+            '<div class="work-share-recipient__copy">' +
+              '<div class="work-share-recipient__username">' + escapeHtml(m.nickname) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="work-share-recipient__check' + (isSelected ? ' is-selected' : '') + '">' +
+            (isSelected ? '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><polyline fill="none" points="21.648 5.352 9.002 17.998 2.358 11.358" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline></svg>' : '') +
+          '</div>' +
+        '</button>';
+      }).join('');
+    };
+
+    // 백드롭 클릭
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeModal();
     });
-    layer.querySelector('.closeup-share-sheet').addEventListener('click', function(e) {
-      e.stopPropagation();
+
+    // 닫기 버튼
+    overlay.querySelector('.work-share-modal__close').addEventListener('click', closeModal);
+
+    // ESC
+    const escHandler = function(e) {
+      if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    // 링크 복사
+    overlay.querySelector('.work-share-modal__link-copy').addEventListener('click', function() {
+      const copyBtn = this;
+      navigator.clipboard.writeText(shareUrl).then(function() {
+        copyBtn.textContent = '복사됨';
+        setTimeout(function() { copyBtn.textContent = '복사'; }, 2000);
+      });
     });
-    document.body.appendChild(layer);
+
+    // 멤버 검색
+    searchInput.addEventListener('input', function() {
+      const keyword = this.value.trim();
+      if (shareSearchTimer) clearTimeout(shareSearchTimer);
+      if (!keyword) { searchCache = []; renderRecipientList(); return; }
+      shareSearchTimer = setTimeout(function() {
+        fetch('/api/messages/search-members?keyword=' + encodeURIComponent(keyword))
+          .then(function(res) { return res.ok ? res.json() : []; })
+          .then(function(members) {
+            searchCache = members || [];
+            if (!searchCache.length) {
+              recipientList.innerHTML =
+                '<div class="work-share-empty">' +
+                  '<div class="work-share-empty__title">검색 결과가 없습니다.</div>' +
+                  '<div class="work-share-empty__copy">다른 이름으로 다시 검색해보세요.</div>' +
+                '</div>';
+              return;
+            }
+            renderRecipientList();
+          });
+      }, 300);
+    });
+
+    // 수신자 선택/해제
+    recipientList.addEventListener('click', function(e) {
+      const recipientBtn = e.target.closest('[data-share-recipient]');
+      if (!recipientBtn) return;
+      const memberId = Number(recipientBtn.dataset.shareRecipient);
+      const existingIdx = selectedRecipients.findIndex(function(r) { return r.id === memberId; });
+      if (existingIdx >= 0) {
+        selectedRecipients.splice(existingIdx, 1);
+      } else {
+        const member = searchCache.find(function(m) { return m.id === memberId; });
+        if (member) selectedRecipients.push(member);
+      }
+      renderChips();
+      renderRecipientList();
+    });
+
+    // 칩 제거
+    chipsContainer.addEventListener('click', function(e) {
+      const removeBtn = e.target.closest('[data-share-remove]');
+      if (!removeBtn) return;
+      const removeId = Number(removeBtn.dataset.shareRemove);
+      selectedRecipients = selectedRecipients.filter(function(r) { return r.id !== removeId; });
+      renderChips();
+      renderRecipientList();
+    });
+
+    // 보내기
+    overlay.querySelector('.work-share-modal__send').addEventListener('click', function() {
+      if (!selectedRecipients.length) {
+        showCloseupMessage('공유할 대상을 1명 이상 선택해주세요.', 'info');
+        return;
+      }
+      const sendBtn = this;
+      sendBtn.disabled = true;
+      sendBtn.textContent = '전송중...';
+
+      const galleryMsg = '[gallery]' + shareUrl + '[/gallery]' + galleryTitle;
+      const sends = selectedRecipients.map(function(r) {
+        return fetch('/api/messages/rooms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ memberIds: [r.id] })
+        })
+        .then(function(res) { return res.ok ? res.json() : null; })
+        .then(function(room) {
+          if (!room) throw new Error('채팅방 생성 실패');
+          return fetch('/api/messages/rooms/' + room.id + '/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: galleryMsg })
+          });
+        });
+      });
+
+      Promise.all(sends)
+        .then(function() {
+          showCloseupMessage('예술관을 공유했습니다.', 'info');
+          closeModal();
+        })
+        .catch(function() {
+          sendBtn.disabled = false;
+          sendBtn.textContent = '보내기';
+          showCloseupMessage('메시지 전송에 실패했습니다.', 'error');
+        });
+    });
+
+    document.body.appendChild(overlay);
+    setTimeout(function() { searchInput.focus(); }, 0);
   }
 
   function toggleCloseupMoreMenu(event, btn) {
@@ -487,6 +705,8 @@ window.addEventListener('load', () => {
     const moreLayer = document.getElementById(CLOSEUP_MORE_MENU_ID);
     if (shareLayer) shareLayer.remove();
     if (moreLayer) moreLayer.remove();
+    document.querySelectorAll('.closeup-floating-layer__backdrop').forEach(function(el) { el.remove(); });
+    document.querySelectorAll('.work-share-modal-overlay').forEach(function(el) { el.remove(); });
     document.querySelectorAll('.closeup__icon-btn--active').forEach(function(btn) {
       if (btn.getAttribute('aria-label') === '좋아요') return;
       btn.classList.remove('closeup__icon-btn--active');
@@ -503,6 +723,14 @@ window.addEventListener('load', () => {
     if (saveBtn) {
       saveBtn.classList.remove('closeup__save-btn--saved');
       saveBtn.textContent = '찜';
+    }
+    const creatorName = closeupView ? closeupView.querySelector('.closeup__creator-name') : null;
+    const followBtn = closeupView ? closeupView.querySelector('.closeup__creator-follow') : null;
+    if (creatorName) creatorName.setAttribute('href', '#');
+    if (followBtn) {
+      followBtn.classList.remove('closeup__creator-follow--following');
+      followBtn.textContent = '팔로우';
+      followBtn.style.display = '';
     }
   }
 
@@ -612,6 +840,7 @@ window.addEventListener('load', () => {
     const creatorAvatar = closeupView.querySelector('.closeup__creator-avatar');
     const creatorName = closeupView.querySelector('.closeup__creator-name');
     const creatorHandle = closeupView.querySelector('.closeup__creator-handle');
+    const followBtn = closeupView.querySelector('.closeup__creator-follow');
     const statCount = closeupView.querySelector('.closeup__stat-count');
     const imageWrap = closeupView.querySelector('.closeup__image-wrap');
     activeCloseupPinId = pinId;
@@ -629,7 +858,11 @@ window.addEventListener('load', () => {
     creatorAvatar.src = creatorAvatarMeta.src;
     creatorAvatar.alt = creatorAvatarMeta.alt;
     creatorName.textContent = creatorAvatarMeta.alt;
+    creatorName.setAttribute('href', '#');
     creatorHandle.textContent = pin && pin.author && pin.author.name ? '@' + pin.author.name : '';
+    if (followBtn) {
+      followBtn.style.display = '';
+    }
     statCount.textContent = pin ? String(pin.saves) : '112';
     imageWrap.style.aspectRatio = '1920 / 1080';
 
@@ -817,8 +1050,8 @@ window.addEventListener('load', () => {
         '</div>' +
         '<p class="closeup__comment-text">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
         '<div class="closeup__comment-actions">' +
-        '<span class="closeup__comment-like-count">0</span>' +
-        '<button class="closeup__comment-like-btn" type="button" data-action="toggle-comment-like">좋아요</button>' +
+        '<button class="closeup__comment-like-btn" type="button" data-action="toggle-comment-like"><svg viewBox="0 0 24 24" width="14" height="14"><path d="' + CLOSEUP_LIKE_OUTLINE_PATH + '"/></svg></button>' +
+        '<span class="closeup__comment-like-count" style="display:none;">0</span>' +
         '</div>' +
         '</div>';
     content.appendChild(comment);
@@ -841,7 +1074,38 @@ window.addEventListener('load', () => {
 
   function toggleCommentLike(btn) {
     if (activeGalleryDetail && activeGalleryDetail.id) {
-      showNotReadyMessage('예술관 댓글 좋아요 기능은 준비 중입니다.');
+      if (!IS_LOGGED_IN) { showAuthModal(); return; }
+      const commentId = Number(btn && btn.dataset ? btn.dataset.commentId : 0);
+      if (!commentId || btn.dataset.pending === 'true') return;
+
+      const countEl = btn.parentElement ? btn.parentElement.querySelector('.closeup__comment-like-count') : null;
+      const previousLiked = btn.classList.contains('closeup__comment-like-btn--active');
+      const previousLikeCount = countEl ? Number(countEl.textContent || 0) : 0;
+      const nextLiked = !previousLiked;
+      const nextLikeCount = nextLiked ? previousLikeCount + 1 : Math.max(0, previousLikeCount - 1);
+
+      btn.dataset.pending = 'true';
+      updateCloseupCommentLikeUi(btn, nextLiked, nextLikeCount);
+
+      fetch('/api/comments/' + commentId + '/likes', {
+        method: 'POST'
+      })
+      .then(async function(response) {
+        if (!response.ok) {
+          throw new Error(await readErrorMessage(response, '예술관 댓글 좋아요 처리에 실패했습니다.'));
+        }
+        return response.json();
+      })
+      .then(function(result) {
+        updateCloseupCommentLikeUi(btn, Boolean(result.liked), Number(result.likeCount || 0));
+      })
+      .catch(function(error) {
+        updateCloseupCommentLikeUi(btn, previousLiked, previousLikeCount);
+        showCloseupMessage(error.message || '예술관 댓글 좋아요 처리에 실패했습니다.', 'error');
+      })
+      .finally(function() {
+        delete btn.dataset.pending;
+      });
       return;
     }
     const countEl = btn.parentElement.querySelector('.closeup__comment-like-count');
@@ -858,7 +1122,32 @@ window.addEventListener('load', () => {
   }
 
   function toggleFollow(btn) {
-    showNotReadyMessage('작성자 팔로우 기능은 준비 중입니다.');
+    if (!IS_LOGGED_IN) { showAuthModal(); return; }
+    if (!activeGalleryDetail || !activeGalleryDetail.memberId || isGalleryFollowPending) return;
+
+    const previousFollowing = Boolean(activeGalleryDetail.isFollowing);
+    isGalleryFollowPending = true;
+    updateCloseupFollowUi(!previousFollowing);
+
+    fetch('/api/members/' + activeGalleryDetail.memberId + '/follow', {
+      method: 'POST'
+    })
+    .then(async function(response) {
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response, '팔로우 처리에 실패했습니다.'));
+      }
+      return response.json();
+    })
+    .then(function(result) {
+      updateCloseupFollowUi(Boolean(result.followed));
+    })
+    .catch(function(error) {
+      updateCloseupFollowUi(previousFollowing);
+      showCloseupMessage(error.message || '팔로우 처리에 실패했습니다.', 'error');
+    })
+    .finally(function() {
+      isGalleryFollowPending = false;
+    });
   }
 
   function toggleCloseupCollapsible(headerEl) {
@@ -1065,6 +1354,7 @@ window.addEventListener('load', () => {
       const creatorAvatar = closeupView.querySelector('.closeup__creator-avatar');
       const creatorName = closeupView.querySelector('.closeup__creator-name');
       const creatorHandle = closeupView.querySelector('.closeup__creator-handle');
+      const followBtn = closeupView.querySelector('.closeup__creator-follow');
       const imageWrap = closeupView.querySelector('.closeup__image-wrap');
 
       activeCloseupPinId = 'gallery-' + galleryId;
@@ -1087,10 +1377,20 @@ window.addEventListener('load', () => {
       creatorAvatar.src = LOCAL_PROFILE_IMAGE;
       creatorAvatar.alt = authorName;
       creatorName.textContent = authorName;
-      creatorHandle.textContent = '';
+      creatorName.setAttribute('href', getActiveGalleryProfileUrl() || '#');
+      creatorHandle.textContent = gallery.memberNickname ? '@' + gallery.memberNickname : '';
       imageWrap.style.aspectRatio = '16 / 9';
       updateCloseupLikeUi(Boolean(gallery.isLiked), Number(gallery.likeCount || 0));
       updateCloseupBookmarkUi(Boolean(gallery.isBookmarked));
+      updateCloseupFollowUi(Boolean(gallery.isFollowing));
+      const isMine = window.__bideoUserId && gallery.memberId && window.__bideoUserId === gallery.memberId;
+      const saveBtn = closeupView.querySelector('.closeup__save-btn');
+      if (followBtn) {
+        followBtn.style.display = (!gallery.memberId || isMine) ? 'none' : '';
+      }
+      if (saveBtn) {
+        saveBtn.style.display = isMine ? 'none' : '';
+      }
       setCommentComposerEnabled(gallery.allowComment !== false, '이 예술관은 댓글 작성이 비활성화되어 있습니다.');
       renderCloseupComments([]);
 

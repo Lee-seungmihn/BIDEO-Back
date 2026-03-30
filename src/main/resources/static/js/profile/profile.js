@@ -1,5 +1,6 @@
 // ─── 상수 & 전역 ─────────────────────────────────
 const IS_OWNER = document.body.dataset.owner === 'true';
+const PROFILE_MEMBER_ID = Number(document.body.dataset.profileMemberId || 0) || null;
 const RING_SIZE = 87;
 const RING_RADIUS = 40.5;
 const RING_ACTIVE = '#c4a84d';
@@ -1853,19 +1854,60 @@ function deleteCurrentGallery() {
 }
 
 // ─── Viewer 전용: 팔로우 토글 ─────────────────────
-let isFollowing = false;
+let isFollowing = document.body.dataset.isFollowing === 'true';
+let isProfileFollowPending = false;
 
-function toggleFollow() {
+function syncProfileFollowButton() {
   const btn = document.getElementById('followBtn');
-  isFollowing = !isFollowing;
+  if (!btn) return;
+
+  btn.classList.remove('btn-primary', 'btn-secondary', 'btn-secondary--active', 'is-following');
   if (isFollowing) {
     btn.textContent = '팔로잉';
-    btn.classList.remove('btn-primary');
     btn.classList.add('btn-secondary', 'btn-secondary--active', 'is-following');
-  } else {
-    btn.textContent = '팔로우';
-    btn.classList.remove('btn-secondary', 'btn-secondary--active', 'is-following');
-    btn.classList.add('btn-primary');
+    return;
+  }
+
+  btn.textContent = '팔로우';
+  btn.classList.add('btn-primary');
+}
+
+async function toggleFollow() {
+  const btn = document.getElementById('followBtn');
+  if (!btn || !PROFILE_MEMBER_ID || isProfileFollowPending) return;
+  if (currentMemberId === null) {
+    if (typeof window.showAuthModal === 'function') {
+      window.showAuthModal();
+      return;
+    }
+    showProfileSnackbar('로그인이 필요합니다.', 'error');
+    return;
+  }
+
+  const previousFollowing = isFollowing;
+  isFollowing = !previousFollowing;
+  syncProfileFollowButton();
+  isProfileFollowPending = true;
+
+  try {
+    const response = await fetch(`/api/members/${PROFILE_MEMBER_ID}/follow`, {
+      method: 'POST'
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || '팔로우 처리에 실패했습니다.');
+    }
+
+    const result = await response.json();
+    isFollowing = Boolean(result.followed);
+    syncProfileFollowButton();
+  } catch (error) {
+    isFollowing = previousFollowing;
+    syncProfileFollowButton();
+    showProfileSnackbar(error.message || '팔로우 처리에 실패했습니다.', 'error');
+  } finally {
+    isProfileFollowPending = false;
   }
 }
 
@@ -2165,6 +2207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 뱃지 초기 렌더
     renderProfileBadges();
   } else {
+    syncProfileFollowButton();
     // Viewer: 팔로우 버튼 hover
     const followBtn = document.getElementById('followBtn');
     if (followBtn) {
