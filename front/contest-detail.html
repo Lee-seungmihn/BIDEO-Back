@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <title>공모전 상세 | BIDEO</title>
+    <link rel="stylesheet" href="../src/main/resources/static/css/main/main.css">
+    <link rel="stylesheet" href="../src/main/resources/static/css/contest/contestlists.css">
+
+    
+    
+    
+</head>
+
+<body class="app-root" style="margin:0">
+
+
+    <div id="__PWS_ROOT__" class="app-root__mount">
+        <div class="main-page-shell app-shell layout-box">
+            <div class="main-page-frame app-shell__frame layout-box">
+
+                <!-- ===== 상단 헤더 (검색바 + 프로필) ===== -->
+                <div role="banner" class="main-header main-header__layout layout-box">
+                    <div data-test-id="header" id="HeaderContent" class="main-header__bar layout-box layout-top-zero layout-right-zero layout-fixed">
+                        <div class="main-header__surface layout-box">
+                            <div data-test-id="header-background" class="main-header__background layout-box size-full width-full surface-default">
+                                <div class="main-header__background-inner layout-box">
+                                    <div class="main-header__row flex-row spacing-inline-zero spacing-block-zero justify-start flex-column">
+                                        <div class="main-header__content layout-box section-padding-x-400 size-full width-full items-center flex-grow flex-row-container">
+                                            <div data-test-id="button-container"
+                                                class="main-header__actions layout-box size-full width-full items-center flex-row-container">
+                                                <!-- 검색 -->
+                                                <div data-test-id="search-box-container" id="searchBoxContainer"
+                                                    class="search-bar main-header__search search-bar__container layout-box spacing-inline-end-200 search-box-inline-zero spacing-block-start-zero flex-grow">
+                                                    <div class="search-bar__shell layout-box rounded-field-surface flex-row-container">
+                                                        <div class="search-bar__inner layout-box position-relative items-center flex-grow flex-row-container">
+                                                            <div class="search-bar__icon-slot layout-box flex-fixed spacing-inline-end-200">
+                                                                <svg aria-label="검색 아이콘" class="icon-svg display-block icon-color-subtle"
+                                                                    height="16" role="img" viewBox="0 0 24 24" width="16">
+                                                                    <path d="M17.33 18.74a10 10 0 1 1 1.41-1.41l4.47 4.47-1.41 1.41zM11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="search-bar__input-wrap layout-box flex-grow">
+                                                                <input aria-label="검색" autocomplete="off"
+                                                                    class="search-bar__input" data-test-id="search-box-input" id="search-input"
+                                                                    placeholder="검색" role="combobox" type="text" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- 프로필 -->
+                                                <div class="profile-menu slot-block">
+                                                    <div class="profile-menu__frame layout-box display-block-wrapper">
+                                                        <div class="profile-menu__control layout-box">
+                                                            <a aria-label="내 프로필"
+                                                                class="profile-summary profile-menu__link link-reset text-color-inherit text-no-underline interactive-scale rounded-400 focus-outline-none display-block-link width-full cursor-pointer"
+                                                                href="#" tabindex="0">
+                                                                <div aria-hidden="true" class="profile-menu__avatar-shell layout-box rounded-400">
+                                                                    <div class="profile-menu__avatar-outer layout-box rounded-circle justify-center items-center flex-row-container">
+                                                                        <div class="profile-menu__avatar-inner layout-box rounded-circle justify-center items-center flex-row-container">
+                                                                            <div class="avatar-frame avatar-size-32">
+                                                                                <div class="overflow-hidden-relative rounded-circle will-change-transform">
+                                                                                    <div>
+                                                                                        <div class="layout-box position-relative avatar-bg">
+                                                                                            <img alt="내 프로필" class="profile-avatar-image"
+                                                                                                src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="avatar-overlay"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- 계정 드롭다운 -->
+                                                <div class="account-menu slot-block">
+                                                    <div class="account-menu__frame layout-box display-block-wrapper">
+                                                        <div class="account-menu__control layout-box">
+                                                            <button aria-expanded="false" aria-haspopup="true"
+                                                                aria-label="계정" class="account-menu-trigger icon-button button-reset"
+                                                                data-test-id="header-accounts-options-button" tabindex="0" type="button">
+                                                                <div class="button-reset-inner interactive-scale cursor-pointer-inner">
+                                                                    <div class="account-menu__icon icon-container rounded-200 icon-surface-transparent">
+                                                                        <svg aria-hidden="true" class="icon-svg display-block icon-color-subtle"
+                                                                            height="12" role="img" viewBox="0 0 24 24" width="12">
+                                                                            <path d="M23.7 8.7 12 20.42.3 8.71l1.4-1.42L12 17.6 22.3 7.3z"></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 메인 콘텐츠 영역 ===== -->
+                <div class="appContent app-content" role="main">
+                    <div class="layout-box appViewport app-viewport">
+                        <main class="cl-page">
+                            <div class="cl-shell">
+
+                                <!-- 뒤로가기 -->
+                                <div class="cl-breadcrumb">
+                                    <a class="cl-back-btn">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M15 18l-6-6 6-6"/>
+                                        </svg>
+                                        목록으로
+                                    </a>
+                                    <span class="cl-breadcrumb-sep">/</span>
+                                    <span class="cl-breadcrumb-label">공모전 상세</span>
+                                </div>
+
+                                <div class="cl-contact-box" style="margin-bottom:24px;border-color:#d7e9d7;background:#f6fff6;">
+                                    <div class="cl-contact-text">성공 메시지</div>
+                                </div>
+                                <div class="cl-contact-box" style="margin-bottom:24px;border-color:#f1d0d0;background:#fff7f7;">
+                                    <div class="cl-contact-text">오류 메시지</div>
+                                </div>
+
+                                <!-- ===== 포스터 + 기본 정보 ===== -->
+                                <div class="cl-hero">
+                                    <!-- 포스터 이미지 -->
+                                    <div class="cl-poster">
+                                        <img
+                                             alt="공모전 포스터">
+                                    </div>
+
+                                    <!-- 정보 블록 -->
+                                    <div class="cl-info">
+                                        <!-- 상태 배지 -->
+                                        <div class="cl-status-row">
+                                            <span class="cl-status-badge">접수중</span>
+                                            <span class="cl-dday-badge">D-3</span>
+                                        </div>
+
+                                        <!-- 제목 -->
+                                        <h1 class="cl-contest-title">공모전 제목</h1>
+                                        <p class="cl-organizer">
+                                            <span>주최 · </span>
+                                            <span>주최 기관</span>
+                                        </p>
+
+                                        <!-- 메타 정보 테이블 -->
+                                        <div class="cl-meta-table">
+                                            <div class="cl-meta-row">
+                                                <span class="cl-meta-key">접수기간</span>
+                                                <span class="cl-meta-val">접수기간</span>
+                                            </div>
+                                            <div class="cl-meta-row">
+                                                <span class="cl-meta-key">분야</span>
+                                                <span class="cl-meta-val">IT</span>
+                                            </div>
+                                            <div class="cl-meta-row">
+                                                <span class="cl-meta-key">상금 및 부상</span>
+                                                <span class="cl-meta-val">100만원</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 액션 버튼 -->
+                                        <div class="cl-actions">
+                                            <form method="post"
+                                                  style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                                                <input type="hidden">
+                                                <select id="workSelect"
+                                                        style="height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--cl-line);min-width:220px;">
+                                                    <option value="">출품할 작품 선택</option>
+                                                    <option>작품</option>
+                                                </select>
+                                                <button class="cl-btn-apply" type="submit" id="entrySubmitBtn" disabled
+                                                        style="opacity:0.5;cursor:not-allowed;">참여하기</button>
+                                            </form>
+                                            <a href="#" class="cl-btn-apply">
+                                                수정하기
+                                            </a>
+                                            <a class="cl-btn-secondary">목록으로</a>
+                                            <button class="cl-btn-icon" id="scrapBtn" title="스크랩" type="button">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                                </svg>
+                                            </button>
+
+                                            <!-- 공유 버튼 그룹 -->
+                                            <div class="cl-share-group">
+                                                <button class="cl-share-btn cl-share-btn--link" title="링크 복사" type="button">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ===== 공모전 본문 ===== -->
+                                <div class="cl-body-section">
+                                    <h2 class="cl-body-section-title">공모전 상세 내용</h2>
+
+                                    <!-- 모집개요 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">모집개요</h3>
+                                        <p class="cl-body-text">공모전 설명</p>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 기간 및 일정 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">기간 및 일정</h3>
+                                        <ul class="cl-body-list">
+                                            <li>지원 접수</li>
+                                            <li>결과 발표</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 출품 현황 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">출품 현황</h3>
+                                        <ul class="cl-body-list">
+                                            <li>총 출품 수</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 목적 및 내용 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">목적 및 내용</h3>
+                                        <ul class="cl-body-list">
+                                            <li>목적 및 내용</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 등록 정보 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">등록 정보</h3>
+                                        <p class="cl-body-text">등록자</p>
+                                        <p class="cl-body-text">조회수</p>
+                                        <p class="cl-body-text">출품 가능한 내 작품이 없습니다. 먼저 작품을 등록해주세요.</p>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 상금 및 부상 -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">상금 및 부상</h3>
+                                        <ul class="cl-body-list">
+                                            <li>100만원</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="cl-divider"></div>
+
+                                    <!-- 출품 작품 (주최자만 볼 수 있음) -->
+                                    <div class="cl-body-block">
+                                        <h3 class="cl-body-heading">출품 작품</h3>
+                                        <div class="cl-contact-box">
+                                            <div class="cl-contact-icon">
+                                                <img
+                                                     alt="작품 썸네일"
+                                                     style="width:48px;height:48px;border-radius:8px;object-fit:cover;">
+                                            </div>
+                                            <div class="cl-contact-text">
+                                                <strong>작품 제목</strong><br>
+                                                <span>출품자 : </span><span>출품자</span><br>
+                                                <span>수상 정보</span>
+                                            </div>
+                                        </div>
+                                        <p class="cl-body-text">아직 등록된 출품 작품이 없습니다.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </main>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:10px 18px;border-radius:24px;text-decoration:none;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.2);">&#8592; 사이트맵</a>
+</body>
+</html>

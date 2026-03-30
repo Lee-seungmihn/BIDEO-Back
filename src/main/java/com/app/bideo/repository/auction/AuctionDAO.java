@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -63,5 +64,9 @@ public class AuctionDAO {
 
     public void deleteWishlist(Long memberId, Long auctionId) {
         auctionMapper.deleteWishlist(memberId, auctionId);
+    }
+
+    public List<Map<String, Object>> findMyWishlist(Long memberId) {
+        return auctionMapper.selectMyWishlist(memberId);
     }
 }

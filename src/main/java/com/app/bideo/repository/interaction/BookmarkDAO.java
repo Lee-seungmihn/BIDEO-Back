@@ -5,6 +5,9 @@ import com.app.bideo.mapper.interaction.BookmarkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 @RequiredArgsConstructor
 public class BookmarkDAO {
@@ -21,5 +24,9 @@ public class BookmarkDAO {
 
     public void delete(Long memberId, String targetType, Long targetId) {
         bookmarkMapper.deleteBookmark(memberId, targetType, targetId);
+    }
+
+    public List<Map<String, Object>> findMyBookmarks(Long memberId) {
+        return bookmarkMapper.selectMyBookmarks(memberId);
     }
 }

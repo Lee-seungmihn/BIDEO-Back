@@ -29,3 +29,4 @@ comment on column tbl_inquiry.status is '상태 (PENDING/ANSWERED/CLOSED)';
 create index idx_inquiry_member on tbl_inquiry (member_id);
 create index idx_inquiry_status on tbl_inquiry (status, created_datetime desc);
 
+select * from tbl_inquiry

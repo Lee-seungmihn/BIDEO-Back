@@ -1,4 +1,4 @@
-package com.app.bideo.domain.admin;
+package com.app.bideo.dto.customerservice;
 
 import lombok.*;
 import java.time.LocalDateTime;
@@ -8,9 +8,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InquiryVO {
+public class CustomerServiceResponseDTO {
     private Long id;
     private Long memberId;
+    private String memberNickname;
     private String category;
     private String content;
     private String reply;

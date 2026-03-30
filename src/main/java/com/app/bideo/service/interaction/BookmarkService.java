@@ -1,6 +1,7 @@
 package com.app.bideo.service.interaction;
 
 import com.app.bideo.domain.interaction.BookmarkVO;
+import com.app.bideo.repository.auction.AuctionDAO;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.interaction.BookmarkDAO;
 import com.app.bideo.service.notification.NotificationService;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -16,6 +19,7 @@ import java.util.Map;
 public class BookmarkService {
 
     private final BookmarkDAO bookmarkDAO;
+    private final AuctionDAO auctionDAO;
     private final GalleryDAO galleryDAO;
     private final NotificationService notificationService;
 
@@ -44,6 +48,22 @@ public class BookmarkService {
     @Transactional(readOnly = true)
     public boolean isBookmarked(Long memberId, String targetType, Long targetId) {
         return bookmarkDAO.exists(memberId, targetType, targetId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getMySavedItems(Long memberId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.addAll(bookmarkDAO.findMyBookmarks(memberId));
+        result.addAll(auctionDAO.findMyWishlist(memberId));
+        result.sort((a, b) -> {
+            var dtA = a.get("createdDatetime");
+            var dtB = b.get("createdDatetime");
+            if (dtA instanceof Comparable && dtB instanceof Comparable) {
+                return ((Comparable) dtB).compareTo(dtA);
+            }
+            return 0;
+        });
+        return result;
     }
 
     private Long resolveOwnerId(String targetType, Long targetId) {

@@ -4,6 +4,9 @@ import com.app.bideo.domain.interaction.BookmarkVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 @Mapper
 public interface BookmarkMapper {
     boolean existsBookmark(@Param("memberId") Long memberId,
@@ -15,4 +18,6 @@ public interface BookmarkMapper {
     void deleteBookmark(@Param("memberId") Long memberId,
                         @Param("targetType") String targetType,
                         @Param("targetId") Long targetId);
+
+    List<Map<String, Object>> selectMyBookmarks(@Param("memberId") Long memberId);
 }

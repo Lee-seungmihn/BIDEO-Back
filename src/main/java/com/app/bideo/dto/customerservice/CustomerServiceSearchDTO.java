@@ -1,4 +1,4 @@
-package com.app.bideo.dto.admin;
+package com.app.bideo.dto.customerservice;
 
 import com.app.bideo.dto.common.PageRequestDTO;
 import lombok.*;
@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InquirySearchDTO extends PageRequestDTO {
+public class CustomerServiceSearchDTO extends PageRequestDTO {
     private String status;
     private Long memberId;
     private String category;

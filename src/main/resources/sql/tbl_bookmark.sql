@@ -22,3 +22,5 @@ comment on column tbl_bookmark.target_type is '대상 타입 (WORK / GALLERY / C
 comment on column tbl_bookmark.target_id is '대상 PK';
 
 create index idx_bookmark_target on tbl_bookmark (target_type, target_id);
+
+select * from tbl_bookmark

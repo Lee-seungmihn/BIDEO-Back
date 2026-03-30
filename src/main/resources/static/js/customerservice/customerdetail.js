@@ -89,13 +89,33 @@ function initCustomerDetailPage() {
     inquiryTextarea?.addEventListener("input", updateInquiryCount);
 
     submitInquiryButton?.addEventListener("click", () => {
-        if (inquiryTextarea) {
-            inquiryTextarea.value = "";
+        const content = inquiryTextarea ? inquiryTextarea.value.trim() : "";
+        if (!content) {
+            alert("내용을 입력해주세요.");
+            return;
         }
 
-        updateInquiryCount();
-        closeInquiryModal();
-        showSuccessToast();
+        fetch("/api/customerservice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ category: "일반문의", content: content })
+        })
+        .then((res) => {
+            if (res.ok) {
+                if (inquiryTextarea) {
+                    inquiryTextarea.value = "";
+                }
+                updateInquiryCount();
+                closeInquiryModal();
+                showSuccessToast();
+            } else {
+                alert("문의 등록에 실패했습니다.");
+            }
+        })
+        .catch(() => {
+            alert("문의 등록에 실패했습니다.");
+        });
     });
 
     document.addEventListener("keydown", (event) => {

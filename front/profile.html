@@ -1,0 +1,718 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIDEO - xsuxa_</title>
+<link rel="icon" type="image/png" href="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png">
+<link rel="stylesheet" href="../src/main/resources/static/css/common/global.css">
+<link rel="stylesheet" href="../src/main/resources/static/css/common/buttons.css">
+<link rel="stylesheet" href="../src/main/resources/static/css/profile/profile.css">
+  
+</head>
+<body data-owner="true">
+<!-- ========== MAIN ========== -->
+<input type="hidden" id="memberNo" value="">
+<div class="main-content">
+  <!-- Profile Header -->
+  <header class="profile-header">
+    <div class="profile-avatar-section">
+      <div class="profile-avatar" id="profileAvatar">
+        <svg class="camera-icon owner-only" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.7">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-username-row">
+        <h2 class="profile-username">xsuxa_</h2>
+        <div class="profile-badges owner-only" id="profileBadges"></div>
+        <svg class="settings-icon owner-only" width="24" height="24" viewBox="0 0 24 24" fill="#262626">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+        </svg>
+      </div>
+      <div class="profile-realname">이준수</div>
+      <div class="profile-stats">
+        <span>예술관 <span class="stat-number">0</span></span>
+        <a href="#">팔로워 <span class="stat-number">311</span></a>
+        <a href="#">팔로우 <span class="stat-number">233</span></a>
+      </div>
+      <div class="profile-tags">
+        <span class="profile-tag">#베이커리</span>
+      </div>
+      <div class="profile-bio">감성 베이킹 & 일상 기록</div>
+    </div>
+  </header>
+  <!-- Action Buttons: Owner -->
+  <div class="action-buttons owner-only">
+    <a href="#" class="btn-secondary profile-action-btn">프로필 편집</a>
+    <a href="#" class="btn-secondary profile-action-btn">대시보드 바로가기</a>
+  </div>
+  <!-- Action Buttons: Viewer -->
+  <div class="action-buttons viewer-only">
+    <button class="btn-primary profile-action-btn" id="followBtn">팔로우</button>
+    <a href="#" class="btn-secondary profile-action-btn">메시지</a>
+  </div>
+  <!-- Story Highlights -->
+  <div class="video-gallery">
+    <li class="video-gallery-li" tabindex="-1">
+      <div class="video-gallery-outer">
+        <div class="video-gallery-padder">
+          <div class="video-gallery-button"
+               role="button"
+               tabindex="0">
+            <div class="canvas-parent">
+              <canvas class="ring-canvas"
+                      width="87"
+                      height="87"></canvas>
+              <div class="icon-container">
+                <img
+                     alt="예술관 커버"
+                     class="video-gallery-cover-image">
+                <span
+                      style="color:#fff;font-size:12px;font-weight:700;"></span>
+              </div>
+            </div>
+            <div class="video-gallery-button__label">
+              <span class="video-gallery-button__label-text" dir="auto"><span>예술관</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class="video-gallery-li owner-only" tabindex="-1">
+      <div class="video-gallery-outer">
+        <div class="video-gallery-padder">
+          <div class="video-gallery-button" role="button" tabindex="0">
+            <div class="canvas-parent">
+              <canvas class="ring-canvas" width="87" height="87"></canvas>
+              <div class="icon-container">
+                <svg aria-label="리스트 아이콘" class="plus-icon" fill="currentColor"
+                     height="44" width="44" role="img" viewBox="0 0 24 24">
+                  <title>리스트 아이콘</title>
+                  <path d="M5 7.5A1.5 1.5 0 1 1 3.5 6 1.5 1.5 0 0 1 5 7.5Zm0 4.5A1.5 1.5 0 1 1 3.5 10.5 1.5 1.5 0 0 1 5 12Zm0 4.5A1.5 1.5 0 1 1 3.5 15 1.5 1.5 0 0 1 5 16.5ZM8 6h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Zm0 4.5h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Zm0 4.5h12a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2Z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="video-gallery-button__label">
+              <span class="video-gallery-button__label-text" dir="auto"><span>리스트</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  </div>
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="#" class="tab-item active" data-tab="grid">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="1" y="1" width="6" height="6"/>
+        <rect x="9" y="1" width="6" height="6"/>
+        <rect x="17" y="1" width="6" height="6"/>
+        <rect x="1" y="9" width="6" height="6"/>
+        <rect x="9" y="9" width="6" height="6"/>
+        <rect x="17" y="9" width="6" height="6"/>
+        <rect x="1" y="17" width="6" height="6"/>
+        <rect x="9" y="17" width="6" height="6"/>
+        <rect x="17" y="17" width="6" height="6"/>
+      </svg>
+    </a>
+    <a href="#" class="tab-item owner-only" data-tab="saved">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+      </svg>
+    </a>
+  </div>
+  <!-- Post Grid -->
+  <div class="post-grid">
+    <div class="post-item"
+         style="cursor:pointer;">
+        <video
+               autoplay
+               muted
+               loop
+               playsinline
+               style="width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; pointer-events:none;"></video>
+        <img
+             alt="작품 이미지"
+             style="width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; pointer-events:none;">
+        <div class="post-placeholder"></div>
+        <div class="post-overlay-icon" style="pointer-events:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff">
+            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+          </svg>
+        </div>
+    </div>
+    <div class="post-item">
+      <a href="#" style="display:block; width:100%; height:100%; text-decoration:none; color:inherit;">
+        <video
+          src="../src/main/resources/static/images/main_vidios/BIDEO_introduce_video.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+          style="width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit;"
+        ></video>
+      </a>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#">소개</a> · <a href="#">도움말</a> · <a href="#">이용약관</a> · <a href="#">개인정보처리방침</a> · <a href="#">문의하기</a>
+    </div>
+    <div class="footer-bottom">
+      <span>한국어</span>
+      <span>© 2026 BIDEO</span>
+    </div>
+  </footer>
+</div>
+
+<div class="modal-overlay work-detail-modal-overlay" id="workDetailModal">
+  <div class="work-detail-sheet">
+    <button class="work-detail-close" type="button">&times;</button>
+    <div class="work-detail-media-wrap" id="workDetailMediaWrap"></div>
+    <div class="work-detail-body">
+      <div class="work-detail-top">
+        <div class="work-detail-author-row">
+          <img class="work-detail-avatar" src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png" alt="BIDEO">
+          <div class="work-detail-author-copy">
+            <div class="work-detail-author-meta">
+              <span class="work-detail-author" id="workDetailAuthor">작성자</span>
+              <div class="work-detail-option-wrap owner-only">
+                <button class="work-detail-option-btn" type="button" aria-label="옵션 더 보기">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="1.5"></circle>
+                    <circle cx="6" cy="12" r="1.5"></circle>
+                    <circle cx="18" cy="12" r="1.5"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="work-detail-title" id="workDetailTitle">제목</div>
+            <div class="work-detail-description" id="workDetailDescription">설명</div>
+            <div class="work-detail-tags" id="workDetailTags"></div>
+            <div class="work-detail-date" id="workDetailDate">작성일</div>
+          </div>
+        </div>
+        <div class="work-detail-actions">
+          <div class="work-detail-action-row">
+            <button class="work-detail-icon-btn" type="button" title="좋아요">
+              <svg aria-label="좋아요" fill="#262626" viewBox="0 0 24 24">
+                <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"/>
+              </svg>
+            </button>
+            <button class="work-detail-icon-btn" type="button" title="댓글">
+              <svg aria-label="댓글 달기" fill="#262626" viewBox="0 0 24 24">
+                <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </button>
+            <button class="work-detail-icon-btn" type="button" title="공유">
+              <svg aria-label="게시물 공유" fill="#262626" viewBox="0 0 24 24">
+                <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="3" y2="10.083"/>
+                <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </button>
+            <button class="work-detail-text-btn" type="button" title="거래하기">
+              <span>거래하기</span>
+            </button>
+            <button class="work-detail-text-btn" type="button" title="경매하기">
+              <span>경매하기</span>
+            </button>
+          </div>
+          <div class="work-detail-price" id="workDetailPrice"></div>
+        </div>
+      </div>
+      <div class="work-detail-comment-input">
+        <input type="text" id="workDetailCommentInput" placeholder="댓글 입력...">
+        <button type="button" id="workDetailCommentSubmit">게시</button>
+      </div>
+      <div class="work-detail-comment-list">
+        <div class="work-detail-comment-item">
+          <img class="work-detail-comment-avatar" src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png" alt="system">
+          <div class="work-detail-comment-copy">
+            <div class="work-detail-comment-body">
+              <span class="work-detail-comment-name">system</span>
+              <span class="work-detail-comment-text" id="workDetailStats">좋아요 0 · 조회수 0</span>
+            </div>
+            <div class="work-detail-comment-meta">
+              <span id="workDetailCommentCount">댓글 0</span>
+            </div>
+          </div>
+        </div>
+        <div class="work-detail-comment-item">
+          <img class="work-detail-comment-avatar" src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png" alt="status">
+          <div class="work-detail-comment-copy">
+            <div class="work-detail-comment-body">
+              <span class="work-detail-comment-name">status</span>
+              <span class="work-detail-comment-text" id="workDetailStatus">ACTIVE</span>
+            </div>
+            <div class="work-detail-comment-meta">
+              <span id="workDetailLicense">LICENSE</span>
+            </div>
+          </div>
+        </div>
+        <div id="workDetailCommentsContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay work-action-modal-overlay" id="workActionModal">
+  <div class="work-action-sheet">
+    <button class="danger" type="button">수정하기</button>
+    <button class="danger" type="button">삭제하기</button>
+    <button class="cancel" type="button">취소</button>
+  </div>
+</div>
+
+<div class="modal-overlay work-edit-modal-overlay" id="workEditModal">
+  <div class="work-edit-modal">
+    <div class="pin-builder work-edit-builder">
+      <div class="builder-header">
+        <div class="builder-header-left"></div>
+        <div class="work-form-header-actions">
+          <button class="publish-btn work-form-primary-btn work-edit-close-btn" type="button">취소</button>
+          <button class="publish-btn work-form-primary-btn" type="button">수정</button>
+        </div>
+      </div>
+      <div class="builder-body">
+        <div class="upload-section">
+          <div class="upload-area" id="workEditUploadArea">
+            <div class="upload-placeholder" id="workEditPlaceholder">
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" transform="rotate(-90 12 12)"/></svg>
+              </div>
+              <p class="upload-text">파일을 선택하거나 여기로<br>드래그 앤 드롭하세요</p>
+              <p class="upload-subtext">1280 × 720 영상 또는 이미지 파일을<br>업로드할 수 있습니다.</p>
+            </div>
+            <video class="preview-image" id="workEditPreviewVideo" muted playsinline style="display:none;"></video>
+            <img class="preview-image" id="workEditPreviewImage" alt="수정 미리보기" style="display:none;">
+            <input type="file" id="workEditFileInput" accept="video/*,image/*">
+          </div>
+          <button class="save-from-url" id="workEditPreviewButton" type="button">미리보기</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label for="workEditTitle">제목</label>
+            <input type="text" id="workEditTitle" maxlength="100" placeholder="제목을 추가해주세요.">
+          </div>
+
+          <div class="form-group">
+            <label for="workEditDescription">설명</label>
+            <textarea id="workEditDescription" maxlength="500" placeholder="작품에 대한 설명을 추가하세요."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="workEditPrice">가격</label>
+            <div class="toggle-row">
+              <div class="toggle-row-text">
+                <span>거래</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="workEditTradeToggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <input type="text" id="workEditPrice" placeholder="가격 설정">
+          </div>
+
+          <div class="tag-section">
+            <div class="tag-input-wrapper" id="workEditTagBox">
+              <label style="font-size:12px;color:#111;width:100%;margin-bottom:2px;">태그된 주제 (0개)</label>
+              <input type="text" class="tag-input" id="workEditTagInput" placeholder="태그 검색">
+            </div>
+            <p class="tag-hint">걱정하지 마세요. 사람들에게 태그는 보여지지 않습니다.</p>
+          </div>
+
+          <div class="product-tag-section">
+            <label>예술관</label>
+            <div class="gallery-select-wrap" id="workEditGallerySelectWrap">
+              <select class="gallery-select" id="workEditGallerySelect">
+                <option value="">선택 안 함</option>
+                <option>예술관</option>
+              </select>
+              <button class="gallery-select-trigger" id="workEditGallerySelectTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="gallery-select-trigger-text">선택 안 함</span>
+                <svg class="gallery-select-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <ul class="gallery-select-list" id="workEditGallerySelectList" role="listbox">
+                <li class="gallery-select-option" data-value="" role="option">선택 안 함</li>
+                <li class="gallery-select-option"
+                    role="option">예술관</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="more-options">
+            <button class="more-options-toggle" id="workEditMoreToggle" type="button">
+              추가 옵션
+              <svg viewBox="0 0 24 24"><path d="M20 9l-8 8-8-8"/></svg>
+            </button>
+            <div class="more-options-content" id="workEditMoreContent">
+              <div class="toggle-row">
+                <div class="toggle-row-text">
+                  <span>옥션 등록하기</span>
+                  <span>경매에 등록할 수 있습니다.</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="workEditAuctionToggle">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="legal-notice">
+            불법 촬영 콘텐츠 등을 게시하는 경우 Pinterest는 한국 전기통신사업법 제22-5(1)조에 미리 해당 콘텐츠의 액세스를 삭제하거나 차단할 수 있으며, 사용자는 관련 법률 및 <a href="#">규정</a>에 따라 처벌을 받을 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay work-edit-preview-modal-overlay" id="workEditPreviewModal">
+  <div class="work-edit-preview-sheet">
+    <button class="work-edit-preview-close" type="button">&times;</button>
+    <div class="work-edit-preview-media" id="workEditPreviewMediaModal"></div>
+    <div class="work-edit-preview-content">
+      <h3 id="workEditPreviewTitleModal">제목</h3>
+      <p id="workEditPreviewDescriptionModal">설명</p>
+      <div id="workEditPreviewTagsModal"></div>
+      <div id="workEditPreviewPriceModal"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== OWNER-ONLY MODALS ========== -->
+
+<!-- Profile Edit Modal -->
+<div class="modal-overlay owner-only" id="editModal">
+  <div class="edit-modal">
+    <div class="edit-modal__top">
+      <button class="btn-close btn-close--ghost">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+      <h3 class="edit-modal__title">프로필 편집</h3>
+      <button class="btn-text" type="button">완료</button>
+    </div>
+    <form class="edit-modal__form" id="editProfileForm" onsubmit="return false;">
+      <div class="edit-modal__field">
+        <label class="edit-modal__label" for="editUsername">사용자 이름</label>
+        <input class="edit-modal__input" type="text" id="editUsername" name="username" placeholder="사용자 이름" maxlength="30">
+      </div>
+      <div class="edit-modal__field">
+        <label class="edit-modal__label" for="editRealname">이름</label>
+        <input class="edit-modal__input" type="text" id="editRealname" name="realname" placeholder="이름" maxlength="30">
+      </div>
+      <div class="edit-modal__field">
+        <label class="edit-modal__label" for="editBio">소개</label>
+        <textarea class="edit-modal__textarea" id="editBio" name="bio" placeholder="소개를 입력하세요" maxlength="150" rows="3"></textarea>
+      </div>
+      <div class="edit-modal__field">
+        <label class="edit-modal__label">태그</label>
+        <div class="edit-modal__tag-input-wrap">
+          <div class="edit-modal__tags" id="editTagList"></div>
+          <input class="edit-modal__tag-input" type="text" id="editTagInput"
+                 placeholder="#태그 입력 후 Enter" maxlength="20">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Avatar Modal -->
+<div class="modal-overlay owner-only" id="avatarModal">
+  <div class="avatar-modal">
+    <div class="avatar-modal__header">
+      <div class="avatar-modal__preview">
+        <button class="avatar-modal__preview-btn" title="프로필 사진">
+          <img class="avatar-modal__preview-img" alt="프로필 사진" src="">
+        </button>
+      </div>
+      <h3 class="avatar-modal__title">프로필 사진</h3>
+      <span class="avatar-modal__subtitle">BIDEO</span>
+    </div>
+    <div class="avatar-modal__actions">
+      <button class="btn-menu-item btn-menu-item--primary">사진 업로드</button>
+      <button class="btn-menu-item btn-menu-item--muted">취소</button>
+      <form style="display:none;">
+        <input id="avatarFileInput" accept="image/jpeg,image/png" type="file">
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Hub Modal -->
+<div class="modal-overlay owner-only" id="settingsModal">
+  <div class="settings-modal">
+    <h3 class="settings-modal__title">프로필 변경</h3>
+    <div class="settings-modal__actions">
+      <button class="btn-menu-item">프로필 사진 변경</button>
+      <button class="btn-menu-item">팔로우·팔로잉</button>
+      <button class="btn-menu-item">뱃지 관리</button>
+      <button class="btn-menu-item">패스워드 변경</button>
+      <button class="btn-menu-item">카드 관리</button>
+      <button class="btn-menu-item btn-menu-item--muted">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- Badge Modal -->
+<div class="modal-overlay modal-overlay--upper owner-only" id="badgeModal">
+  <div class="badge-modal">
+    <div class="badge-modal__top">
+      <button class="btn-close btn-close--ghost">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+      <h3 class="badge-modal__title">뱃지 관리</h3>
+      <button class="btn-text">완료</button>
+    </div>
+    <p class="badge-modal__hint">최대 2개 선택 가능</p>
+    <div class="badge-modal__grid" id="badgeGrid"></div>
+  </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal-overlay modal-overlay--upper owner-only" id="passwordModal">
+  <div class="password-modal">
+    <div class="password-modal__top">
+      <button class="btn-close btn-close--ghost">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+      <h3 class="password-modal__title">패스워드 변경</h3>
+      <button class="btn-text">완료</button>
+    </div>
+    <form class="password-modal__form" id="passwordForm" onsubmit="return false;">
+      <div class="password-modal__field">
+        <label class="password-modal__label" for="currentPassword">현재 비밀번호</label>
+        <input class="password-modal__input" type="password" id="currentPassword" placeholder="현재 비밀번호">
+      </div>
+      <div class="password-modal__field">
+        <label class="password-modal__label" for="newPassword">새 비밀번호</label>
+        <input class="password-modal__input" type="password" id="newPassword" placeholder="새 비밀번호">
+      </div>
+      <div class="password-modal__field">
+        <label class="password-modal__label" for="confirmPassword">새 비밀번호 확인</label>
+        <input class="password-modal__input" type="password" id="confirmPassword" placeholder="새 비밀번호 확인">
+      </div>
+      <p class="password-modal__error" id="passwordError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ========== COMMON MODALS ========== -->
+
+<!-- Follow Modal -->
+<div class="modal-overlay modal-overlay--upper" id="followModal">
+  <div class="follow-modal">
+    <div class="follow-modal__top">
+      <button class="btn-close btn-close--ghost">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+      <h3 class="follow-modal__title">팔로워</h3>
+      <span></span>
+    </div>
+    <div class="follow-modal__tabs">
+      <button class="follow-modal__tab active" data-follow-tab="followers">팔로워</button>
+      <button class="follow-modal__tab" data-follow-tab="following">팔로잉</button>
+    </div>
+    <div class="follow-modal__search">
+      <input class="follow-modal__search-input" type="text" placeholder="검색" oninput="filterFollowList(this.value)">
+    </div>
+    <div class="follow-modal__list" id="followList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay modal-overlay--upper owner-only" id="galleryListModal">
+  <div class="gallery-list-modal">
+    <div class="gallery-list-modal__top">
+      <h3 class="gallery-list-modal__title">예술관 리스트</h3>
+      <span></span>
+      <button class="btn-close btn-close--ghost" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <path d="M15.18 12l7.16-7.16a2.25 2.25 0 10-3.18-3.18L12 8.82 4.84 1.66a2.25 2.25 0 10-3.18 3.18L8.82 12l-7.16 7.16a2.25 2.25 0 103.18 3.18L12 15.18l7.16 7.16a2.25 2.25 0 103.18-3.18z" fill="#111"/>
+        </svg>
+      </button>
+    </div>
+    <div class="gallery-list-modal__body">
+      <button class="gallery-list-modal__item"
+              type="button">
+        <div class="gallery-list-modal__thumb">
+          <img
+               alt="예술관 커버">
+          <span>예술관</span>
+        </div>
+        <div class="gallery-list-modal__copy">
+          <strong>예술관</strong>
+          <span>작품 0개</span>
+        </div>
+      </button>
+      <div class="gallery-list-modal__empty">
+        등록된 예술관이 없습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay modal-overlay--upper owner-only" id="galleryCloseupModal">
+  <div class="closeup__primary-column gallery-closeup-modal-panel">
+    <button class="gallery-closeup__close" type="button">&times;</button>
+    <section class="closeup__hero-card gallery-closeup-hero-card">
+      <div class="closeup__media-column">
+        <div class="closeup__image-stage">
+          <div class="closeup__image-wrap gallery-closeup__media-wrap">
+            <img id="galleryCloseupImage" class="closeup__image gallery-closeup__image" src="" alt="예술관 커버">
+            <div id="galleryCloseupFallback" class="gallery-closeup__fallback" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <section class="closeup__discussion-section gallery-closeup__discussion" aria-label="예술관 상세와 댓글">
+        <div class="closeup__info-column">
+          <div class="gallery-closeup__eyebrow">예술관 미리보기</div>
+          <div class="closeup__title-section gallery-closeup__title-section">
+            <h3 id="galleryCloseupTitle" class="closeup__title gallery-closeup__title">예술관</h3>
+            <p id="galleryCloseupDescription" class="closeup__description-text gallery-closeup__description">등록된 예술관 정보입니다.</p>
+          </div>
+            <div class="closeup__creator gallery-closeup__creator">
+              <img class="closeup__creator-avatar" src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png" alt="creator">
+              <div class="closeup__creator-copy">
+                <div class="closeup__creator-name-row">
+                  <span id="galleryCloseupOwner" class="closeup__creator-name">creator</span>
+                  <div class="work-detail-option-wrap owner-only">
+                    <button class="work-detail-option-btn" type="button" aria-label="예술관 옵션 더 보기">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="1.5"></circle>
+                        <circle cx="6" cy="12" r="1.5"></circle>
+                        <circle cx="18" cy="12" r="1.5"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="closeup__creator-handle">BIDEO gallery</p>
+              </div>
+            </div>
+          <div class="gallery-closeup__stats">
+            <div class="gallery-closeup__stat">
+              <strong id="galleryCloseupWorkCount">0</strong>
+              <span>작품</span>
+            </div>
+            <div class="gallery-closeup__stat">
+              <strong id="galleryCloseupLikeCount">0</strong>
+              <span>좋아요</span>
+            </div>
+            <div class="gallery-closeup__stat">
+              <strong id="galleryCloseupViewCount">0</strong>
+              <span>조회수</span>
+            </div>
+          </div>
+        </div>
+        <div class="closeup__divider"></div>
+        <div class="closeup__comments closeup__comments--open gallery-closeup__comments">
+          <button class="closeup__collapsible-header" type="button">
+            댓글
+          </button>
+          <div class="closeup__collapsible-content gallery-closeup__collapsible-content" id="galleryCloseupCommentsContainer">
+            <div class="closeup__comment-item">
+              <img class="closeup__comment-avatar" src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png" alt="comment">
+              <div class="closeup__comment-body">
+                <div class="closeup__comment-meta">
+                  <span class="closeup__comment-author">BIDEO</span>
+                  <span class="closeup__comment-time">안내</span>
+                </div>
+                <p class="closeup__comment-text">아직 댓글이 없습니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="closeup__comment-composer gallery-closeup__composer">
+          <div class="closeup__comment-box">
+            <div class="closeup__comment-input" id="galleryCloseupCommentInput" contenteditable="true" role="textbox" aria-label="댓글 입력" data-placeholder="댓글을 추가하고 대화를 시작하세요."></div>
+            <div class="closeup__comment-toolbar">
+              <div class="closeup__toolbar-right">
+                <button class="closeup__submit-btn closeup__submit-btn--visible" id="galleryCloseupCommentSubmit" type="button" aria-label="게시">
+                  <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M4.07 1.37a2.1 2.1 0 0 0-2.8 2.59L3.94 12l-2.69 8.04a2.1 2.1 0 0 0 2.81 2.6l18.1-7.7A3 3 0 0 0 24 12.18v-.36a3 3 0 0 0-1.83-2.76zm-.89 1.86a.1.1 0 0 1 .1-.02l18.11 7.7a1 1 0 0 1 .61.91v.36a1 1 0 0 1-.6.92L3.28 20.8a.1.1 0 0 1-.13-.12L5.72 13H14v-2H5.72L3.16 3.33a.1.1 0 0 1 .02-.1"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </div>
+</div>
+
+<div class="modal-overlay work-action-modal-overlay" id="galleryActionModal">
+  <div class="work-action-sheet">
+    <button class="danger" type="button">수정하기</button>
+    <button class="danger" type="button">삭제하기</button>
+    <button class="cancel" type="button">취소</button>
+  </div>
+</div>
+
+<div class="modal-overlay work-edit-modal-overlay" id="galleryEditModal">
+  <div class="work-edit-modal gallery-edit-modal">
+    <div class="pin-builder work-edit-builder gallery-edit-builder">
+      <div class="builder-header">
+        <div class="builder-header-left"></div>
+        <div class="work-form-header-actions">
+          <button class="publish-btn work-form-primary-btn work-edit-close-btn" type="button">취소</button>
+          <button class="publish-btn work-form-primary-btn" type="button">수정</button>
+        </div>
+      </div>
+      <div class="builder-body">
+        <div class="upload-section">
+          <div class="upload-area" id="galleryEditUploadArea">
+            <div class="upload-placeholder" id="galleryEditPlaceholder">
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" transform="rotate(-90 12 12)"/></svg>
+              </div>
+              <p class="upload-text">사진을 선택하거나 여기로<br>드래그 앤 드롭하세요</p>
+              <p class="upload-subtext">이미지 파일만 업로드할 수 있습니다.</p>
+            </div>
+            <img class="preview-image" id="galleryEditPreviewImage" alt="예술관 미리보기" style="display:none;">
+            <input type="file" id="galleryEditFileInput" accept="image/*">
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label for="galleryEditTitleInput">제목</label>
+            <input type="text" id="galleryEditTitleInput" placeholder="제목을 추가하세요." maxlength="100">
+          </div>
+
+          <div class="form-group">
+            <label for="galleryEditDescriptionInput">설명</label>
+            <textarea id="galleryEditDescriptionInput" placeholder="예술관에 대한 설명을 추가하세요." maxlength="500"></textarea>
+          </div>
+
+          <div class="legal-notice">
+            불법 촬영 콘텐츠 등을 게시하는 경우 Bideo는 한국 전기통신사업법 제22-5(1)조에 미리 해당 콘텐츠의 액세스를 삭제하거나 차단할 수 있으며, 사용자는 관련 법률 및 <a href="#">규정</a>에 따라 처벌을 받을 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:10px 18px;border-radius:24px;text-decoration:none;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.2);">&#8592; 사이트맵</a>
+</body>
+</html>

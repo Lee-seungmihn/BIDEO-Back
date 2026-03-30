@@ -60,7 +60,30 @@ function initCustomerServicePage() {
         });
 
         if (inquirySubmitButton) {
-            inquirySubmitButton.addEventListener("click", showSuccessToast);
+            inquirySubmitButton.addEventListener("click", () => {
+                const content = inquiryTextarea ? inquiryTextarea.value.trim() : "";
+                if (!content) {
+                    alert("내용을 입력해주세요.");
+                    return;
+                }
+
+                fetch("/api/customerservice", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ category: "일반문의", content: content })
+                })
+                .then((res) => {
+                    if (res.ok) {
+                        showSuccessToast();
+                    } else {
+                        alert("문의 등록에 실패했습니다.");
+                    }
+                })
+                .catch(() => {
+                    alert("문의 등록에 실패했습니다.");
+                });
+            });
         }
 
         document.addEventListener("keydown", (event) => {

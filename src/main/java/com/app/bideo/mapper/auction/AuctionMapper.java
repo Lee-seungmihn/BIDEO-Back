@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface AuctionMapper {
@@ -44,4 +45,6 @@ public interface AuctionMapper {
 
     void deleteWishlist(@Param("memberId") Long memberId,
                         @Param("auctionId") Long auctionId);
+
+    List<Map<String, Object>> selectMyWishlist(@Param("memberId") Long memberId);
 }

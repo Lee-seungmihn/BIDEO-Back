@@ -1071,6 +1071,8 @@ function switchTab(e, clicked) {
   clicked.classList.add('active');
   clicked.innerHTML = TAB_ICONS[clicked.dataset.tab].active;
 
+  const postGrid = document.querySelector('.post-grid');
+
   // 비디오갤러리 연동
   const highlights = document.querySelectorAll('.video-gallery-li:not(:has(.plus-icon))');
   if (clicked.dataset.tab === 'saved') {
@@ -1079,13 +1081,58 @@ function switchTab(e, clicked) {
       const c = li.querySelector('.ring-canvas');
       if (c) drawRing(c, false);
     });
+    loadSavedItems(postGrid);
   } else {
     const first = highlights[0];
     if (first) {
       first.classList.add('video-gallery-active');
       drawRing(first.querySelector('.ring-canvas'), true);
     }
+    restoreOriginalGrid(postGrid);
   }
+}
+
+let _originalGridHTML = null;
+
+function restoreOriginalGrid(postGrid) {
+  if (_originalGridHTML && postGrid) {
+    postGrid.innerHTML = _originalGridHTML;
+  }
+}
+
+function loadSavedItems(postGrid) {
+  if (!postGrid) return;
+  if (!_originalGridHTML) {
+    _originalGridHTML = postGrid.innerHTML;
+  }
+
+  fetch("/api/bookmarks/my", { credentials: "include" })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load");
+      return res.json();
+    })
+    .then(items => {
+      if (items.length === 0) {
+        postGrid.innerHTML = '<div style="text-align:center;padding:60px 0;color:#999;grid-column:1/-1;">저장된 항목이 없습니다.</div>';
+        return;
+      }
+
+      postGrid.innerHTML = items.map(item => {
+        const typeLabel = { WORK: '작품', GALLERY: '예술관', CONTEST: '공모전', AUCTION: '경매' };
+        const badge = typeLabel[item.targetType] || item.targetType;
+        const thumbnail = item.thumbnail
+          ? '<img src="' + item.thumbnail + '" alt="' + (item.title || '') + '" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;">'
+          : '<div class="post-placeholder"></div>';
+
+        return '<div class="post-item" style="cursor:pointer;position:relative;">' +
+          thumbnail +
+          '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;">' + badge + '</div>' +
+          '</div>';
+      }).join('');
+    })
+    .catch(() => {
+      postGrid.innerHTML = '<div style="text-align:center;padding:60px 0;color:#999;grid-column:1/-1;">저장 목록을 불러올 수 없습니다.</div>';
+    });
 }
 
 // ─── 팔로우·팔로잉 모달 (공통) ──────────────────

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <title>공모전 목록 | BIDEO</title>
+    <link rel="stylesheet" href="../src/main/resources/static/css/main/main.css">
+    <link rel="stylesheet" href="../src/main/resources/static/css/contest/contest-list.css">
+
+    
+    
+    
+</head>
+
+<body class="app-root" style="margin:0">
+
+
+    <div id="__PWS_ROOT__" class="app-root__mount">
+        <div class="main-page-shell app-shell layout-box">
+            <div class="main-page-frame app-shell__frame layout-box">
+
+                <!-- ===== 상단 헤더 (검색바 + 프로필) ===== -->
+                <div role="banner" class="main-header main-header__layout layout-box">
+                    <div data-test-id="header" id="HeaderContent" class="main-header__bar layout-box layout-top-zero layout-right-zero layout-fixed">
+                        <div class="main-header__surface layout-box">
+                            <div data-test-id="header-background" class="main-header__background layout-box size-full width-full surface-default">
+                                <div class="main-header__background-inner layout-box">
+                                    <div class="main-header__row flex-row spacing-inline-zero spacing-block-zero justify-start flex-column">
+                                        <div class="main-header__content layout-box section-padding-x-400 size-full width-full items-center flex-grow flex-row-container">
+                                            <div data-test-id="button-container"
+                                                class="main-header__actions layout-box size-full width-full items-center flex-row-container">
+                                                <!-- 검색 -->
+                                                <div data-test-id="search-box-container" id="searchBoxContainer"
+                                                    class="search-bar main-header__search search-bar__container layout-box spacing-inline-end-200 search-box-inline-zero spacing-block-start-zero flex-grow">
+                                                    <div class="search-bar__shell layout-box rounded-field-surface flex-row-container">
+                                                        <div class="search-bar__inner layout-box position-relative items-center flex-grow flex-row-container">
+                                                            <div class="search-bar__icon-slot layout-box flex-fixed spacing-inline-end-200">
+                                                                <svg aria-label="검색 아이콘" class="icon-svg display-block icon-color-subtle"
+                                                                    height="16" role="img" viewBox="0 0 24 24" width="16">
+                                                                    <path
+                                                                        d="M17.33 18.74a10 10 0 1 1 1.41-1.41l4.47 4.47-1.41 1.41zM11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16">
+                                                                    </path>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="search-bar__input-wrap layout-box flex-grow">
+                                                                <input aria-label="검색" autocomplete="off"
+                                                                    class="search-bar__input" data-test-id="search-box-input" id="search-input"
+                                                                    placeholder="검색" role="combobox"
+                                                                    type="text" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- 프로필 -->
+                                                <div class="profile-menu slot-block">
+                                                    <div class="profile-menu__frame layout-box display-block-wrapper">
+                                                        <div class="profile-menu__control layout-box">
+                                                            <a aria-label="내 프로필"
+                                                                class="profile-summary profile-menu__link link-reset text-color-inherit text-no-underline interactive-scale rounded-400 focus-outline-none display-block-link width-full cursor-pointer"
+                                                                href="#" tabindex="0">
+                                                                <div aria-hidden="true" class="profile-menu__avatar-shell layout-box rounded-400">
+                                                                    <div class="profile-menu__avatar-outer layout-box rounded-circle justify-center items-center flex-row-container">
+                                                                        <div class="profile-menu__avatar-inner layout-box rounded-circle justify-center items-center flex-row-container">
+                                                                            <div class="avatar-frame avatar-size-32">
+                                                                                <div class="overflow-hidden-relative rounded-circle will-change-transform">
+                                                                                    <div>
+                                                                                        <div class="layout-box position-relative avatar-bg">
+                                                                                            <img alt="내 프로필"
+                                                                                                class="profile-avatar-image"
+                                                                                                src="../src/main/resources/static/images/BIDEO_LOGO/BIDEO_favicon.png">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="avatar-overlay"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- 계정 드롭다운 -->
+                                                <div class="account-menu slot-block">
+                                                    <div class="account-menu__frame layout-box display-block-wrapper">
+                                                        <div class="account-menu__control layout-box">
+                                                            <button aria-expanded="false" aria-haspopup="true"
+                                                                aria-label="계정" class="account-menu-trigger icon-button button-reset"
+                                                                data-test-id="header-accounts-options-button" tabindex="0"
+                                                                type="button">
+                                                                <div class="button-reset-inner interactive-scale cursor-pointer-inner">
+                                                                    <div class="account-menu__icon icon-container rounded-200 icon-surface-transparent">
+                                                                        <svg aria-hidden="true" class="icon-svg display-block icon-color-subtle"
+                                                                            height="12" role="img" viewBox="0 0 24 24"
+                                                                            width="12">
+                                                                            <path
+                                                                                d="M23.7 8.7 12 20.42.3 8.71l1.4-1.42L12 17.6 22.3 7.3z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 메인 콘텐츠 영역 ===== -->
+                <div class="appContent app-content" role="main">
+                    <div class="layout-box appViewport app-viewport">
+                        <main class="cl-page">
+                            <div class="cl-shell">
+
+                                <!-- 정렬 + 검색 툴바 -->
+                                <div class="contest-toolbar">
+                                    <div class="sort-group">
+                                        <button class="sort-btn sort-btn--active" data-sort="" type="button">최신 등록순</button>
+                                        <button class="sort-btn" data-sort="deadline" type="button">마감일순</button>
+                                        <button class="sort-btn" data-sort="entryStart" type="button">접수일순</button>
+                                        <button class="sort-btn" id="myContestBtn" type="button">내 공모전</button>
+                                        <button class="sort-btn" id="myEntryBtn" type="button">참여한 공모전</button>
+                                    </div>
+                                    <div class="contest-search-form">
+                                        <input type="text" id="contestKeyword" placeholder="공모전 검색" class="contest-search-input">
+                                        <button type="button" id="contestSearchBtn" class="contest-search-btn">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.33 18.74a10 10 0 1 1 1.41-1.41l4.47 4.47-1.41 1.41zM11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 공모전 카드 그리드 -->
+                                <div class="contest-list-wrap" id="contestGrid">
+                                    <div class="contest-card">
+                                        <a class="card-link">
+                                            <div class="card-thumb">
+                                                <img alt="공모전 썸네일">
+                                                <span class="card-dday"></span>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-category"></p>
+                                                <h3 class="card-title"></h3>
+                                                <p class="card-host"></p>
+                                                <p class="card-deadline">
+                                                    <span class="deadline-label">마감일</span>
+                                                    <span></span>
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div id="contestEmpty" class="contest-empty">
+                                    <p>등록된 공모전이 없습니다.</p>
+                                </div>
+
+                                <!-- 페이지네이션 -->
+                                <nav id="contestPagination" class="pagination" aria-label="페이지 네비게이션"></nav>
+
+                            </div>
+                        </main>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+<a href="index.html" style="position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:10px 18px;border-radius:24px;text-decoration:none;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.2);">&#8592; 사이트맵</a>
+</body>
+</html>

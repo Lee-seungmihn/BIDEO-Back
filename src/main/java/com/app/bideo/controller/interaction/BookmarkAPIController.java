@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,6 +24,13 @@ public class BookmarkAPIController {
             @RequestBody BookmarkRequestDTO requestDTO) {
         Map<String, Object> result = bookmarkService.toggleBookmark(
                 userDetails.getId(), requestDTO.getTargetType(), requestDTO.getTargetId());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<Map<String, Object>>> getMySavedItems(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<Map<String, Object>> result = bookmarkService.getMySavedItems(userDetails.getId());
         return ResponseEntity.ok(result);
     }
 

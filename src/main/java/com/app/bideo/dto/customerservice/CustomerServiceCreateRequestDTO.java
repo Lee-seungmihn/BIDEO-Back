@@ -1,4 +1,4 @@
-package com.app.bideo.dto.admin;
+package com.app.bideo.dto.customerservice;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InquiryCreateRequestDTO {
+public class CustomerServiceCreateRequestDTO {
     private String category;
     private String content;
 }
