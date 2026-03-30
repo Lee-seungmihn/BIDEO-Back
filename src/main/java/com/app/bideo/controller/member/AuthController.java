@@ -74,12 +74,16 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    // 로컬 로그인은 서버 토큰 상태를 정리하고, 소셜 로그인은 쿠키만 제거한다.
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         if (jwtTokenProvider.validateToken(accessToken)) {
-            String email = jwtTokenProvider.getEmail(accessToken);
-            jwtTokenProvider.deleteRefreshToken(email);
-            jwtTokenProvider.addToBlacklist(accessToken);
+            String provider = jwtTokenProvider.getProvider(accessToken);
+            if ("LOCAL".equalsIgnoreCase(provider)) {
+                String email = jwtTokenProvider.getEmail(accessToken);
+                jwtTokenProvider.deleteRefreshToken(email);
+                jwtTokenProvider.addToBlacklist(accessToken);
+            }
         }
         jwtTokenProvider.clearTokenCookies(response);
         SecurityContextHolder.clearContext();
