@@ -65,6 +65,8 @@ public interface WorkMapper {
 
     boolean existsActiveAuctionByWorkId(@Param("workId") Long workId);
 
+    boolean existsEndedLatestAuctionByWorkId(@Param("workId") Long workId);
+
     boolean existsWorkLike(@Param("memberId") Long memberId, @Param("workId") Long workId);
 
     void insertWorkLike(@Param("memberId") Long memberId, @Param("workId") Long workId);

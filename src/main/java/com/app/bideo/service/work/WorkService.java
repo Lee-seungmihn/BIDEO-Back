@@ -109,6 +109,7 @@ public class WorkService {
         detail.setIsLiked(memberId != null && workDAO.existsLike(memberId, id));
         detail.setIsBookmarked(memberId != null && bookmarkDAO.exists(memberId, "WORK", id));
         detail.setHasActiveAuction(workDAO.existsActiveAuctionByWorkId(id));
+        detail.setHasEndedAuction(workDAO.existsEndedLatestAuctionByWorkId(id));
         if (detail.getComments() != null) {
             detail.getComments().forEach(comment ->
                     comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()))

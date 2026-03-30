@@ -640,13 +640,21 @@ async function renderWorkDetailModal(work) {
     auctionButton.classList.toggle('is-disabled', false);
     const auctionText = work.hasActiveAuction
       ? (isOwnWork ? '경매중' : '경매참여하기')
+      : work.hasEndedAuction
+        ? '경매 종료'
       : (isViewerWork ? '경매요청하기' : '경매하기');
+    if (work.hasEndedAuction) {
+      auctionButton.disabled = true;
+      auctionButton.classList.toggle('is-disabled', true);
+    }
     auctionButton.title = auctionText;
     auctionButton.setAttribute('aria-label', auctionText);
   }
   if (auctionLabel) {
     auctionLabel.textContent = work.hasActiveAuction
       ? (isOwnWork ? '경매중' : '경매참여하기')
+      : work.hasEndedAuction
+        ? '경매 종료'
       : (isViewerWork ? '경매요청하기' : '경매하기');
   }
 

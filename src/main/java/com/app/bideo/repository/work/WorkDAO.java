@@ -101,6 +101,10 @@ public class WorkDAO {
         return workMapper.existsActiveAuctionByWorkId(workId);
     }
 
+    public boolean existsEndedLatestAuctionByWorkId(Long workId) {
+        return workMapper.existsEndedLatestAuctionByWorkId(workId);
+    }
+
     public boolean existsLike(Long memberId, Long workId) {
         return workMapper.existsWorkLike(memberId, workId);
     }

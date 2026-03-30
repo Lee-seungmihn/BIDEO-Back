@@ -393,6 +393,22 @@
             from tbl_auction
             where work_id = #{workId}
               and status = 'ACTIVE'
+              and closing_at > now()
+        )
+    </select>
+
+    <select id="existsEndedLatestAuctionByWorkId" resultType="boolean">
+        select exists (
+            select 1
+            from tbl_auction latest
+            where latest.id = (
+                select a.id
+                from tbl_auction a
+                where a.work_id = #{workId}
+                order by a.created_datetime desc, a.id desc
+                limit 1
+            )
+              and (latest.status != 'ACTIVE' or latest.closing_at &lt;= now())
         )
     </select>
 

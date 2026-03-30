@@ -38,6 +38,7 @@ public class WorkDetailResponseDTO {
     private Boolean isLiked;
     private Boolean isBookmarked;
     private Boolean hasActiveAuction;
+    private Boolean hasEndedAuction;
     private LocalDateTime createdDatetime;
     private LocalDateTime updatedDatetime;
     private LocalDateTime deletedDatetime;
