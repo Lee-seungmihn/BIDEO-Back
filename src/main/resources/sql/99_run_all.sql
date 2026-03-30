@@ -50,3 +50,4 @@
 \ir tbl_settlement_deduction.sql
 \ir tbl_withdrawal_request.sql
 \ir seed_badge.sql
+\ir tbl_like.sql

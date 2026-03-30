@@ -5,6 +5,7 @@ import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.mapper.gallery.GalleryMapper;
@@ -126,6 +127,14 @@ public class GalleryDAO {
 
     public int findLikeCount(Long galleryId) {
         return Optional.ofNullable(galleryMapper.selectGalleryLikeCount(galleryId)).orElse(0);
+    }
+
+    public List<GalleryListResponseDTO> findAll(GallerySearchDTO searchDTO) {
+        return galleryMapper.selectGalleryList(searchDTO);
+    }
+
+    public int findTotal(GallerySearchDTO searchDTO) {
+        return galleryMapper.selectGalleryCount(searchDTO);
     }
 
     public List<GalleryListResponseDTO> findRecommended() {

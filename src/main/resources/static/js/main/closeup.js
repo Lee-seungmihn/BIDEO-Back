@@ -1,6 +1,6 @@
 // ─── Closeup View (depends on main.js globals) ──────────────
 // Globals used from main.js: IS_LOGGED_IN, pinStore, createAvatarDataUri(),
-//   showToast(), LOCAL_PROFILE_IMAGE, fetchWorks(), mapWorkToPin(),
+//   showToast(), LOCAL_PROFILE_IMAGE, fetchGalleries(), mapGalleryToPin(),
 //   createArtGalleryCardHTML(), BATCH_SIZE
 // Globals used from auth-modal.js: showAuthModal()
 window.addEventListener('load', () => {
@@ -275,17 +275,17 @@ window.addEventListener('load', () => {
     const pinId = cardEl.getAttribute('data-id');
     var pin = pinStore.get(pinId);
     // API fallback: pinStore에 없으면 상세 조회
-    if (!pin && pinId && pinId.startsWith('work-')) {
+    if (!pin && pinId && pinId.startsWith('gallery-')) {
       try {
-        var workId = pinId.replace('work-', '');
-        var res = await fetch('/api/works/' + workId);
+        var galleryId = pinId.replace('gallery-', '');
+        var res = await fetch('/api/galleries/' + galleryId);
         if (res.ok) {
           var detail = await res.json();
-          pin = mapWorkToPin(detail);
+          pin = mapGalleryToPin(detail);
           pin.description = detail.description || '';
           pinStore.set(pinId, pin);
         }
-      } catch (e) { console.error('작품 상세 조회 실패:', e); }
+      } catch (e) { console.error('예술관 상세 조회 실패:', e); }
     }
     const img = cardEl.querySelector('.art-gallery-card__image');
     const title = cardEl.querySelector('.art-gallery-card__title');
@@ -381,8 +381,8 @@ window.addEventListener('load', () => {
     var belowContainer = document.getElementById('closeupBelowPins');
     var targetPinId = activePinId || activeCloseupPinId;
     try {
-      var data = await fetchWorks(closeupPage, count);
-      var relatedPins = (data.content || []).map(mapWorkToPin).filter(function(pin) {
+      var data = await fetchGalleries(closeupPage, count);
+      var relatedPins = (data.content || []).map(mapGalleryToPin).filter(function(pin) {
         return pin.id !== targetPinId;
       });
       relatedPins.forEach(function(p) { pinStore.set(p.id, p); });
@@ -535,7 +535,7 @@ window.addEventListener('load', () => {
 
     return {
       src: avatarSrc,
-      fallback: avatarFallback,
+      fallback: LOCAL_PROFILE_IMAGE,
       alt: authorName
     };
   }
@@ -723,7 +723,7 @@ window.addEventListener('load', () => {
         this.onerror = null;
         this.src = LOCAL_PROFILE_IMAGE;
       };
-      creatorAvatar.src = avatarFallback;
+      creatorAvatar.src = LOCAL_PROFILE_IMAGE;
       creatorAvatar.alt = authorName;
       creatorName.textContent = authorName;
       creatorHandle.textContent = '';

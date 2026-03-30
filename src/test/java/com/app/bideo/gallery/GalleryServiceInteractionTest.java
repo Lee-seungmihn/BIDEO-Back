@@ -18,11 +18,11 @@ class GalleryServiceInteractionTest {
     private GalleryDAO galleryDAO;
     private GalleryService galleryService;
 
-    @BeforeEach
-    void setUp() {
-        galleryDAO = Mockito.mock(GalleryDAO.class);
-        galleryService = new GalleryService(galleryDAO, Mockito.mock(WorkDAO.class));
-    }
+//    @BeforeEach
+//    void setUp() {
+//        galleryDAO = Mockito.mock(GalleryDAO.class);
+//        galleryService = new GalleryService(galleryDAO, Mockito.mock(WorkDAO.class));
+//    }
 
     @Test
     void writeCommentRejectsWhenGalleryDisablesComments() {

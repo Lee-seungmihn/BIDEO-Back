@@ -10,6 +10,7 @@ import com.app.bideo.dto.contest.ContestSearchDTO;
 import com.app.bideo.dto.contest.ContestWorkOptionDTO;
 import com.app.bideo.dto.contest.ContestUpdateRequestDTO;
 import com.app.bideo.mapper.contest.ContestMapper;
+import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ContestService {
 
     private final ContestMapper contestMapper;
     private final NotificationService notificationService;
+    private final S3FileService s3FileService;
 
     public Long createContest(Long memberId, ContestCreateRequestDTO contestCreateRequestDTO) {
         validateContestCreateRequest(contestCreateRequestDTO);
@@ -47,6 +49,7 @@ public class ContestService {
     @Transactional(readOnly = true)
     public PageResponseDTO<ContestListResponseDTO> getContestList(ContestSearchDTO searchDTO) {
         List<ContestListResponseDTO> list = contestMapper.selectContestList(searchDTO);
+        list.forEach(c -> c.setCoverImage(s3FileService.getPresignedUrl(c.getCoverImage())));
         int total = contestMapper.selectContestCount(searchDTO);
         int size = searchDTO.getSize() != null ? searchDTO.getSize() : 10;
         int totalPages = (int) Math.ceil((double) total / size);
@@ -66,6 +69,7 @@ public class ContestService {
         if (result == null) {
             throw new IllegalArgumentException("contest not found");
         }
+        result.setCoverImage(s3FileService.getPresignedUrl(result.getCoverImage()));
         return result;
     }
 
@@ -106,6 +110,7 @@ public class ContestService {
     @Transactional(readOnly = true)
     public PageResponseDTO<ContestListResponseDTO> getHostedContestList(Long memberId) {
         List<ContestListResponseDTO> list = contestMapper.selectHostedContestList(memberId);
+        list.forEach(c -> c.setCoverImage(s3FileService.getPresignedUrl(c.getCoverImage())));
         return PageResponseDTO.<ContestListResponseDTO>builder()
                 .content(list)
                 .page(1)
@@ -118,6 +123,7 @@ public class ContestService {
     @Transactional(readOnly = true)
     public PageResponseDTO<ContestListResponseDTO> getParticipatedContestList(Long memberId) {
         List<ContestListResponseDTO> list = contestMapper.selectParticipatedContestList(memberId);
+        list.forEach(c -> c.setCoverImage(s3FileService.getPresignedUrl(c.getCoverImage())));
         return PageResponseDTO.<ContestListResponseDTO>builder()
                 .content(list)
                 .page(1)
@@ -151,13 +157,7 @@ public class ContestService {
     }
 
     private String saveCoverImage(MultipartFile coverFile) {
-        try {
-            String contentType = coverFile.getContentType() != null ? coverFile.getContentType() : "image/png";
-            String base64 = Base64.getEncoder().encodeToString(coverFile.getBytes());
-            return "data:" + contentType + ";base64," + base64;
-        } catch (IOException e) {
-            throw new RuntimeException("contest cover image upload failed", e);
-        }
+        return s3FileService.upload("contests", coverFile);
     }
 
     private void validateContestCreateRequest(ContestCreateRequestDTO requestDTO) {

@@ -4,14 +4,17 @@ import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.domain.gallery.GalleryTagVO;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
+import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.interaction.CommentService;
+import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -37,6 +40,7 @@ public class GalleryService {
     private final WorkDAO workDAO;
     private final CommentService commentService;
     private final NotificationService notificationService;
+    private final S3FileService s3FileService;
 
     // 예술관 등록
     public void write(Long memberId, GalleryCreateRequestDTO requestDTO, MultipartFile coverFile) {
@@ -46,6 +50,28 @@ public class GalleryService {
         requestDTO.setShowSimilar(requestDTO.getShowSimilar() != null ? requestDTO.getShowSimilar() : true);
         galleryDAO.save(requestDTO);
         saveTags(requestDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
+    }
+
+    // 메인 피드용 예술관 목록 페이징 조회
+    @Transactional(readOnly = true)
+    public PageResponseDTO<GalleryListResponseDTO> getGalleryList(GallerySearchDTO searchDTO) {
+        int page = searchDTO.getPage() != null ? searchDTO.getPage() : 1;
+        int size = searchDTO.getSize() != null ? searchDTO.getSize() : 10;
+        searchDTO.setPage(page);
+        searchDTO.setSize(size);
+
+        List<GalleryListResponseDTO> list = galleryDAO.findAll(searchDTO);
+        list.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
+        int total = galleryDAO.findTotal(searchDTO);
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        return PageResponseDTO.<GalleryListResponseDTO>builder()
+                .content(list)
+                .page(page)
+                .size(size)
+                .totalElements((long) total)
+                .totalPages(totalPages)
+                .build();
     }
 
     // 프로필 하이라이트용 예술관 목록 조회
@@ -59,7 +85,10 @@ public class GalleryService {
     public List<GalleryListResponseDTO> getProfileGalleries(Long memberId) { // 이승민| 프로필 닉네임 경로 적용으로 인한 추가
         List<GalleryListResponseDTO> galleries = galleryDAO.findAllByMemberId(memberId);
         Long currentMemberId = resolveAuthenticatedMemberId();
-        galleries.forEach(gallery -> gallery.setIsLiked(currentMemberId != null && galleryDAO.existsLike(currentMemberId, gallery.getId())));
+        galleries.forEach(gallery -> {
+            gallery.setCoverImage(s3FileService.getPresignedUrl(gallery.getCoverImage()));
+            gallery.setIsLiked(currentMemberId != null && galleryDAO.existsLike(currentMemberId, gallery.getId()));
+        });
         return galleries;
     }
 
@@ -68,6 +97,7 @@ public class GalleryService {
     public GalleryDetailResponseDTO getGalleryDetail(Long id) {
         GalleryDetailResponseDTO detail = galleryDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
+        detail.setCoverImage(s3FileService.getPresignedUrl(detail.getCoverImage()));
         detail.setTags(galleryDAO.findTagsByGalleryId(id));
 
         Long memberId = resolveAuthenticatedMemberId();
@@ -78,7 +108,9 @@ public class GalleryService {
     // 추천 예술관 (인기순)
     @Transactional(readOnly = true)
     public List<GalleryListResponseDTO> getRecommendedGalleries() {
-        return galleryDAO.findRecommended();
+        List<GalleryListResponseDTO> galleries = galleryDAO.findRecommended();
+        galleries.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
+        return galleries;
     }
 
     public void update(Long id, Long memberId, GalleryUpdateRequestDTO requestDTO, MultipartFile coverFile) {
@@ -224,13 +256,7 @@ public class GalleryService {
             throw new IllegalArgumentException("image file only");
         }
 
-        try {
-            String contentType = coverFile.getContentType() != null ? coverFile.getContentType() : "image/png";
-            String base64 = Base64.getEncoder().encodeToString(coverFile.getBytes());
-            return "data:" + contentType + ";base64," + base64;
-        } catch (IOException e) {
-            throw new RuntimeException("gallery image upload failed", e);
-        }
+        return s3FileService.upload("galleries", coverFile);
     }
 
     private void saveTags(Long galleryId, List<Long> tagIds, List<String> tagNames) {
