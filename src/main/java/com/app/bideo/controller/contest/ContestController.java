@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,11 @@ public class ContestController {
         model.addAttribute("entries", entries);
         model.addAttribute("entryForm", ContestEntryRequestDTO.builder().contestId(id).build());
         model.addAttribute("isOwner", isOwner);
+        model.addAttribute("canSelectWinner",
+                isOwner
+                        && contest.getWinnerNotifiedAt() == null
+                        && contest.getEntryEnd() != null
+                        && LocalDate.now().isAfter(contest.getEntryEnd()));
         if (userDetails != null && !isOwner) {
             List<ContestWorkOptionDTO> availableWorks = contestService.getEntryWorkOptions(userDetails.getId());
             model.addAttribute("availableWorks", availableWorks);
@@ -203,5 +209,19 @@ public class ContestController {
             model.addAttribute("errorMessage", e.getMessage());
             return "contest/contest-register";
         }
+    }
+
+    @PostMapping("/{id}/winner")
+    public String selectWinner(@PathVariable Long id,
+                               @RequestParam Long entryId,
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            contestService.selectWinner(id, userDetails.getId(), entryId);
+            redirectAttributes.addFlashAttribute("successMessage", "우승작이 저장되었습니다.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/contest/detail/" + id;
     }
 }

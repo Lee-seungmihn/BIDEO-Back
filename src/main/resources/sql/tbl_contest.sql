@@ -19,6 +19,7 @@ create table tbl_contest (
     status      varchar(255)   not null default 'UPCOMING',
     entry_count int       not null default 0,
     view_count  int       not null default 0,
+    winner_notified_at  timestamp     null,
     created_datetime  timestamp     not null default now(),
     updated_datetime  timestamp     not null default now(),
     deleted_datetime  timestamp     null,
@@ -43,7 +44,14 @@ comment on column tbl_contest.price is '참가비';
 comment on column tbl_contest.status is '상태 (UPCOMING/OPEN/CLOSED/RESULT)';
 comment on column tbl_contest.entry_count is '출품 수 (비정규화)';
 comment on column tbl_contest.view_count is '조회수 (비정규화)';
+comment on column tbl_contest.winner_notified_at is '수상자 알림 발송 일시';
 comment on column tbl_contest.deleted_datetime is '삭제 일시';
 
 create index idx_contest_member on tbl_contest (member_id);
 create index idx_contest_status on tbl_contest (status, entry_start);
+
+
+ALTER TABLE tbl_contest
+    ADD COLUMN winner_notified_at timestamp NULL;
+
+COMMENT ON COLUMN tbl_contest.winner_notified_at IS '수상자 알림 발송 일시';

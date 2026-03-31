@@ -228,6 +228,17 @@ class ContestControllerTest {
         assertEquals(9L, model.getAttribute("contestId"));
     }
 
+    @Test
+    void selectWinnerRedirectsBackToContestDetailWithSuccessMessage() {
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String viewName = contestController.selectWinner(9L, 300L, authenticatedPrincipal(7L), redirectAttributes);
+
+        assertEquals("redirect:/contest/detail/9", viewName);
+        verify(contestService).selectWinner(9L, 7L, 300L);
+        assertEquals("우승작이 저장되었습니다.", redirectAttributes.getFlashAttributes().get("successMessage"));
+    }
+
     private PageResponseDTO<ContestListResponseDTO> pageResponse() {
         return PageResponseDTO.<ContestListResponseDTO>builder()
                 .content(List.of(ContestListResponseDTO.builder().id(1L).title("테스트").build()))

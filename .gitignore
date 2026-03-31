@@ -9,6 +9,7 @@ key/
 *.zip
 application*
 .claude
+front
 
 ### STS ###
 .apt_generated

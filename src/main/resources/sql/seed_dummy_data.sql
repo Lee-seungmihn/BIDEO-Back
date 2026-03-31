@@ -132,6 +132,16 @@ VALUES
 ((SELECT id FROM tbl_member WHERE email='demo02@bideo.kr'), '세계 여행 기록', '전 세계를 여행하며 담은 영상들의 컬렉션.', '/images/sample/gallery_cover_02.jpg', true, true, 5, 891, 67, 8923, 'EXHIBITING', now() - interval '80 days', now()),
 ((SELECT id FROM tbl_member WHERE email='demo03@bideo.kr'), '요리의 예술', '음식을 예술로 승화시킨 요리 영상 컬렉션.', '/images/sample/gallery_cover_03.jpg', true, true, 5, 567, 45, 6789, 'EXHIBITING', now() - interval '75 days', now()),
 ((SELECT id FROM tbl_member WHERE email='demo04@bideo.kr'), '빛의 서사', '빛과 그림자로 이야기하는 시네마토그래피 컬렉션.', '/images/sample/gallery_cover_04.jpg', true, true, 5, 1234, 89, 12345, 'EXHIBITING', now() - interval '115 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo05@bideo.kr'), '모션 아트 갤러리', '실험적 모션 그래픽과 애니메이션 작품들.', '/images/sample/gallery_cover_05.jpg', true, true, 5, 2345, 123, 15678, 'EXHIBITING', now() - interval '145 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo01@bideo.kr'), '디자인 영감 컬렉션', '공간, 타이포그래피, 브랜드 디자인의 영감을 모은 예술관입니다.', '/images/sample/gallery_cover_01.jpg', true, true, 5, 345, 23, 4567, 'EXHIBITING', now() - interval '85 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo02@bideo.kr'), '세계 여행 기록', '전 세계를 여행하며 담은 영상들의 컬렉션.', '/images/sample/gallery_cover_02.jpg', true, true, 5, 891, 67, 8923, 'EXHIBITING', now() - interval '80 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo03@bideo.kr'), '요리의 예술', '음식을 예술로 승화시킨 요리 영상 컬렉션.', '/images/sample/gallery_cover_03.jpg', true, true, 5, 567, 45, 6789, 'EXHIBITING', now() - interval '75 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo04@bideo.kr'), '빛의 서사', '빛과 그림자로 이야기하는 시네마토그래피 컬렉션.', '/images/sample/gallery_cover_04.jpg', true, true, 5, 1234, 89, 12345, 'EXHIBITING', now() - interval '115 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo05@bideo.kr'), '모션 아트 갤러리', '실험적 모션 그래픽과 애니메이션 작품들.', '/images/sample/gallery_cover_05.jpg', true, true, 5, 2345, 123, 15678, 'EXHIBITING', now() - interval '145 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo01@bideo.kr'), '디자인 영감 컬렉션', '공간, 타이포그래피, 브랜드 디자인의 영감을 모은 예술관입니다.', '/images/sample/gallery_cover_01.jpg', true, true, 5, 345, 23, 4567, 'EXHIBITING', now() - interval '85 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo02@bideo.kr'), '세계 여행 기록', '전 세계를 여행하며 담은 영상들의 컬렉션.', '/images/sample/gallery_cover_02.jpg', true, true, 5, 891, 67, 8923, 'EXHIBITING', now() - interval '80 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo03@bideo.kr'), '요리의 예술', '음식을 예술로 승화시킨 요리 영상 컬렉션.', '/images/sample/gallery_cover_03.jpg', true, true, 5, 567, 45, 6789, 'EXHIBITING', now() - interval '75 days', now()),
+((SELECT id FROM tbl_member WHERE email='demo04@bideo.kr'), '빛의 서사', '빛과 그림자로 이야기하는 시네마토그래피 컬렉션.', '/images/sample/gallery_cover_04.jpg', true, true, 5, 1234, 89, 12345, 'EXHIBITING', now() - interval '115 days', now()),
 ((SELECT id FROM tbl_member WHERE email='demo05@bideo.kr'), '모션 아트 갤러리', '실험적 모션 그래픽과 애니메이션 작품들.', '/images/sample/gallery_cover_05.jpg', true, true, 5, 2345, 123, 15678, 'EXHIBITING', now() - interval '145 days', now());
 
 -- ── 5. 예술관-작품 연결 ──────────────────────────────────────

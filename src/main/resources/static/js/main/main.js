@@ -36,7 +36,7 @@ window.addEventListener('load', () => {
   const BATCH_SIZE = 30;
   const pinStore = new Map();
   let currentPage = 1;
-  let hasMorePages = true;
+  let hasMoreMainPages = true;
   let currentKeyword = '';
 
   async function fetchGalleries(page, size) {
@@ -51,6 +51,7 @@ window.addEventListener('load', () => {
     return {
       id: 'gallery-' + gallery.id,
       galleryId: gallery.id,
+      memberId: gallery.memberId || null,
       imageUrl: gallery.coverImage || '/images/BIDEO_LOGO/BIDEO_favicon.png',
       width: 400,
       height: 300,
@@ -96,13 +97,16 @@ window.addEventListener('load', () => {
 
 // ─── 예술관 카드 HTML 생성 ─────────────────────────
   function createArtGalleryCardHTML(pin) {
+    const isMine = window.__bideoUserId && pin.memberId && window.__bideoUserId === pin.memberId;
+    const saveBtn = isMine ? '' :
+        '<button class="art-gallery-card__save-btn" type="button" data-action="toggle-pin-save">찜</button>';
     return (
-        '<article class="art-gallery-card" data-id="' + pin.id + '" data-action="open-pin-detail">' +
+        '<article class="art-gallery-card" data-id="' + pin.id + '" data-member-id="' + (pin.memberId || '') + '" data-action="open-pin-detail">' +
         '<div class="art-gallery-card__image-wrap" style="aspect-ratio:' + pin.width + '/' + pin.height + '">' +
         '<img class="art-gallery-card__image" src="' + pin.imageUrl + '" alt="' + pin.title + '" width="' + pin.width + '" height="' + pin.height + '" loading="lazy" />' +
         '<div class="art-gallery-card__overlay">' +
         '<div class="art-gallery-card__top-actions">' +
-        '<button class="art-gallery-card__save-btn" type="button" data-action="toggle-pin-save">찜</button>' +
+        saveBtn +
         '</div>' +
         '<div class="art-gallery-card__bottom-actions">' +
         '<div class="art-gallery-card__action-group">' +
@@ -428,7 +432,7 @@ window.addEventListener('load', () => {
   async function executeSearch(keyword) {
     currentKeyword = keyword || '';
     currentPage = 1;
-    hasMorePages = true;
+    hasMoreMainPages = true;
     pinStore.clear();
     const masonryEl = document.getElementById('masonry');
     if (masonryEl) masonryEl.innerHTML = '';
@@ -528,7 +532,8 @@ window.addEventListener('load', () => {
 
 
 // ─── 작품 렌더링 & 무한 스크롤 ───────────────────────
-  let isLoading = false;
+  let isMainLoading = false;
+  let isCloseupLoading = false;
 
   function getActiveFeedElements() {
     if (window.isCloseupOpen) {
@@ -556,31 +561,39 @@ window.addEventListener('load', () => {
   }
 
   async function loadMorePins() {
-    if (isLoading || !hasMorePages) return;
-    isLoading = true;
-    const activeFeed = getActiveFeedElements();
-    const loaderEl = activeFeed.loader;
+    if (isMainLoading || !hasMoreMainPages || window.isCloseupOpen) return;
+    isMainLoading = true;
+    const loaderEl = document.getElementById('loader');
     if (loaderEl) loaderEl.classList.remove('loader--hidden');
     try {
-      if (window.isCloseupOpen) {
-        if (typeof window.appendCloseupPins === 'function') {
-          await window.appendCloseupPins(BATCH_SIZE);
-        } else {
-          console.warn('appendCloseupPins hook is not available yet');
-          return;
-        }
-      } else {
-        const data = await fetchGalleries(currentPage, BATCH_SIZE);
-        const pins = (data.content || []).map(mapGalleryToPin);
-        pins.forEach(function (p) { pinStore.set(p.id, p); });
-        renderPins(pins);
-        currentPage++;
-        hasMorePages = currentPage <= (data.totalPages || 1);
-      }
+      const data = await fetchGalleries(currentPage, BATCH_SIZE);
+      const pins = (data.content || []).map(mapGalleryToPin);
+      pins.forEach(function (p) { pinStore.set(p.id, p); });
+      renderPins(pins);
+      currentPage++;
+      hasMoreMainPages = currentPage <= (data.totalPages || 1);
     } catch (e) {
       console.error('작품 로드 실패:', e);
     }
-    isLoading = false;
+    isMainLoading = false;
+    if (loaderEl) loaderEl.classList.add('loader--hidden');
+  }
+
+  async function loadMoreCloseupPins() {
+    if (isCloseupLoading || !window.isCloseupOpen) return;
+    if (typeof window.appendCloseupPins !== 'function') {
+      console.warn('appendCloseupPins hook is not available yet');
+      return;
+    }
+    isCloseupLoading = true;
+    const loaderEl = document.getElementById('closeupLoader');
+    if (loaderEl) loaderEl.classList.remove('loader--hidden');
+    try {
+      await window.appendCloseupPins(BATCH_SIZE);
+    } catch (e) {
+      console.error('클로즈업 작품 로드 실패:', e);
+    }
+    isCloseupLoading = false;
     if (loaderEl) loaderEl.classList.add('loader--hidden');
   }
 
@@ -699,7 +712,13 @@ window.addEventListener('load', () => {
         function (entries) {
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
-              loadMorePins();
+              if (entry.target === loaderEl) {
+                loadMorePins();
+                return;
+              }
+              if (entry.target === closeupLoaderEl) {
+                loadMoreCloseupPins();
+              }
             }
           });
         },
@@ -710,7 +729,7 @@ window.addEventListener('load', () => {
 
     // scroll 이벤트 백업 (IntersectionObserver가 안 될 경우 대비)
     window.addEventListener('scroll', function () {
-      if (isLoading) return;
+      if (isMainLoading || window.isCloseupOpen || !hasMoreMainPages) return;
       const scrollBottom = window.innerHeight + window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
       if (scrollBottom >= docHeight - 800) {

@@ -23,6 +23,9 @@
         FROM tbl_contest c
         WHERE c.deleted_datetime IS NULL
           AND c.status != 'DELETED'
+        <if test="participatedMemberId == null">
+            AND c.entry_end >= CURRENT_DATE
+        </if>
         <if test="keyword != null and keyword != ''">
             AND (c.title ILIKE '%' || #{keyword} || '%'
                  OR c.organizer ILIKE '%' || #{keyword} || '%')
@@ -58,6 +61,9 @@
         FROM tbl_contest c
         WHERE c.deleted_datetime IS NULL
           AND c.status != 'DELETED'
+        <if test="participatedMemberId == null">
+            AND c.entry_end >= CURRENT_DATE
+        </if>
         <if test="keyword != null and keyword != ''">
             AND (c.title ILIKE '%' || #{keyword} || '%'
                  OR c.organizer ILIKE '%' || #{keyword} || '%')
@@ -94,6 +100,7 @@
         <result property="entryCount" column="entry_count"/>
         <result property="viewCount" column="view_count"/>
         <result property="isBookmarked" column="is_bookmarked"/>
+        <result property="winnerNotifiedAt" column="winner_notified_at"/>
         <result property="createdDatetime" column="created_datetime"/>
         <collection property="tags" ofType="TagResponseDTO"
                     select="selectContestTagsByContestId" column="id"/>
@@ -117,6 +124,7 @@
             c.status,
             c.entry_count,
             c.view_count,
+            c.winner_notified_at,
             CASE WHEN #{memberId} IS NOT NULL THEN
                 EXISTS(SELECT 1 FROM tbl_bookmark
                        WHERE member_id = #{memberId}
@@ -268,6 +276,15 @@
         )
     </select>
 
+    <select id="existsContestEntryById" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_contest_entry
+            WHERE contest_id = #{contestId}
+              AND id = #{entryId}
+        )
+    </select>
+
     <insert id="insertContestEntry" parameterType="map">
         INSERT INTO tbl_contest_entry (
             contest_id,
@@ -287,6 +304,20 @@
         SET entry_count = entry_count + 1,
             updated_datetime = now()
         WHERE id = #{contestId}
+    </update>
+
+    <update id="clearContestWinner">
+        UPDATE tbl_contest_entry
+        SET award_rank = null
+        WHERE contest_id = #{contestId}
+          AND award_rank IS NOT NULL
+    </update>
+
+    <update id="updateContestWinner">
+        UPDATE tbl_contest_entry
+        SET award_rank = #{awardRank}
+        WHERE contest_id = #{contestId}
+          AND id = #{entryId}
     </update>
 
     <select id="selectEntryWorkOptions" resultType="ContestWorkOptionDTO">
@@ -342,5 +373,28 @@
     <delete id="deleteContestTagsByContestId">
         DELETE FROM tbl_contest_tag WHERE contest_id = #{contestId}
     </delete>
+
+    <select id="selectPendingWinnerNotifications" resultType="ContestWinnerNotificationDTO">
+        SELECT
+            c.id AS contest_id,
+            c.member_id AS contest_owner_id,
+            ce.member_id AS winner_member_id,
+            ce.work_id AS winner_work_id
+        FROM tbl_contest c
+        JOIN tbl_contest_entry ce
+          ON ce.contest_id = c.id
+         AND ce.award_rank = '우승'
+        WHERE c.deleted_datetime IS NULL
+          AND c.winner_notified_at IS NULL
+          AND c.result_date IS NOT NULL
+          AND c.result_date &lt;= to_timestamp(#{todayEpochDay} * 86400)::date
+    </select>
+
+    <update id="markWinnerNotificationSent">
+        UPDATE tbl_contest
+        SET winner_notified_at = now(),
+            updated_datetime = now()
+        WHERE id = #{contestId}
+    </update>
 
 </mapper>

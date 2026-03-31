@@ -81,7 +81,7 @@ public class NotificationService {
             case "COMMENT" -> !Boolean.FALSE.equals(setting.getCommentMentionNotify());
             case "BID", "AUCTION_END" -> !Boolean.FALSE.equals(setting.getAuctionNotify());
             case "PAYMENT", "SETTLEMENT" -> !Boolean.FALSE.equals(setting.getPaymentSettlementNotify());
-            case "CONTEST_ENTRY" -> !Boolean.FALSE.equals(setting.getContestNotify());
+            case "CONTEST_ENTRY", "CONTEST_WIN" -> !Boolean.FALSE.equals(setting.getContestNotify());
             default -> true;
         };
     }

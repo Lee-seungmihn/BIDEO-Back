@@ -427,25 +427,15 @@ window.addEventListener('load', () => {
     detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function toggleCloseupShareMenu(event, btn) {
-    event.stopPropagation();
-    const existing = document.getElementById(CLOSEUP_SHARE_SHEET_ID);
-    if (existing) {
-      existing.remove();
-      return;
-    }
+  function openGalleryShareModal(shareUrl, galleryTitle, onClose) {
+    const existingOverlay = document.querySelector('.work-share-modal-overlay');
+    if (existingOverlay) { existingOverlay.remove(); return; }
 
-    closeAllMenus();
-    btn.classList.add('closeup__icon-btn--active');
-
-    const shareUrl = window.location.origin + (getActiveGalleryProfileUrl() || window.location.pathname);
-    const galleryTitle = (activeGalleryDetail && activeGalleryDetail.title) ? activeGalleryDetail.title.replace(/"/g, '&quot;').replace(/</g, '&lt;') : '예술관';
     let selectedRecipients = [];
     let shareSearchTimer = null;
     let searchCache = [];
 
     const overlay = document.createElement('div');
-    overlay.id = CLOSEUP_SHARE_SHEET_ID;
     overlay.className = 'modal-overlay work-share-modal-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
@@ -482,7 +472,8 @@ window.addEventListener('load', () => {
 
     const closeModal = function() {
       overlay.remove();
-      btn.classList.remove('closeup__icon-btn--active');
+      document.removeEventListener('keydown', escHandler);
+      if (onClose) onClose();
     };
 
     const escapeHtml = function(str) {
@@ -534,21 +525,16 @@ window.addEventListener('load', () => {
       }).join('');
     };
 
-    // 백드롭 클릭
     overlay.addEventListener('click', function(e) {
       if (e.target === overlay) closeModal();
     });
-
-    // 닫기 버튼
     overlay.querySelector('.work-share-modal__close').addEventListener('click', closeModal);
 
-    // ESC
     const escHandler = function(e) {
-      if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+      if (e.key === 'Escape') closeModal();
     };
     document.addEventListener('keydown', escHandler);
 
-    // 링크 복사
     overlay.querySelector('.work-share-modal__link-copy').addEventListener('click', function() {
       const copyBtn = this;
       navigator.clipboard.writeText(shareUrl).then(function() {
@@ -557,7 +543,6 @@ window.addEventListener('load', () => {
       });
     });
 
-    // 멤버 검색
     searchInput.addEventListener('input', function() {
       const keyword = this.value.trim();
       if (shareSearchTimer) clearTimeout(shareSearchTimer);
@@ -580,7 +565,6 @@ window.addEventListener('load', () => {
       }, 300);
     });
 
-    // 수신자 선택/해제
     recipientList.addEventListener('click', function(e) {
       const recipientBtn = e.target.closest('[data-share-recipient]');
       if (!recipientBtn) return;
@@ -596,7 +580,6 @@ window.addEventListener('load', () => {
       renderRecipientList();
     });
 
-    // 칩 제거
     chipsContainer.addEventListener('click', function(e) {
       const removeBtn = e.target.closest('[data-share-remove]');
       if (!removeBtn) return;
@@ -606,7 +589,6 @@ window.addEventListener('load', () => {
       renderRecipientList();
     });
 
-    // 보내기
     overlay.querySelector('.work-share-modal__send').addEventListener('click', function() {
       if (!selectedRecipients.length) {
         showCloseupMessage('공유할 대상을 1명 이상 선택해주세요.', 'info');
@@ -648,6 +630,17 @@ window.addEventListener('load', () => {
 
     document.body.appendChild(overlay);
     setTimeout(function() { searchInput.focus(); }, 0);
+  }
+
+  function toggleCloseupShareMenu(event, btn) {
+    event.stopPropagation();
+    closeAllMenus();
+    btn.classList.add('closeup__icon-btn--active');
+    const shareUrl = window.location.origin + (getActiveGalleryProfileUrl() || window.location.pathname);
+    const galleryTitle = (activeGalleryDetail && activeGalleryDetail.title) ? activeGalleryDetail.title.replace(/"/g, '&quot;').replace(/</g, '&lt;') : '예술관';
+    openGalleryShareModal(shareUrl, galleryTitle, function() {
+      btn.classList.remove('closeup__icon-btn--active');
+    });
   }
 
   function toggleCloseupMoreMenu(event, btn) {
@@ -1222,18 +1215,21 @@ window.addEventListener('load', () => {
     event.stopPropagation();
     closeAllMenus();
     const card = btn.closest('.art-gallery-card');
-    const existing = card.querySelector('.context-menu');
-    if (existing) { existing.remove(); return; }
+    const pinId = card ? card.getAttribute('data-id') : null;
+    const pin = pinId ? pinStore.get(pinId) : null;
 
-    const menu = document.createElement('div');
-    menu.className = 'context-menu';
-    menu.innerHTML =
-        '<div class="context-menu__title">공유</div>' +
-        '<button class="context-menu__item" type="button" data-action="copy-pin-link">링크 복사</button>' +
-        '<button class="context-menu__item" type="button">Facebook</button>' +
-        '<button class="context-menu__item" type="button">X (Twitter)</button>' +
-        '<button class="context-menu__item" type="button">WhatsApp</button>';
-    btn.closest('.art-gallery-card__action-group').appendChild(menu);
+    let shareUrl;
+    let galleryTitle;
+    if (pin && pin.author && pin.author.name) {
+      const galleryId = pin.galleryId || (pinId ? pinId.replace('gallery-', '') : '');
+      shareUrl = window.location.origin + '/profile/' + encodeURIComponent(pin.author.name) + '?galleryId=' + galleryId;
+      galleryTitle = (pin.title || '예술관').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    } else {
+      const img = card ? card.querySelector('.art-gallery-card__image') : null;
+      shareUrl = img ? img.src : window.location.href;
+      galleryTitle = '예술관';
+    }
+    openGalleryShareModal(shareUrl, galleryTitle);
   }
 
   function copyPinLink(btn) {
@@ -1252,11 +1248,20 @@ window.addEventListener('load', () => {
     const existing = card.querySelector('.context-menu');
     if (existing) { existing.remove(); return; }
 
+    const cardMemberId = card ? Number(card.getAttribute('data-member-id')) : null;
+    const isMine = window.__bideoUserId && cardMemberId && window.__bideoUserId === cardMemberId;
+
     const menu = document.createElement('div');
     menu.className = 'context-menu';
-    menu.innerHTML =
-        '<button class="context-menu__item" type="button">작품 신고</button>' +
-        '<button class="context-menu__item" type="button" data-action="hide-pin-card">이 작품 숨기기</button>'
+    if (isMine) {
+      menu.innerHTML =
+          '<button class="context-menu__item" type="button" data-action="edit-pin-gallery">예술관 수정</button>' +
+          '<button class="context-menu__item" type="button" data-action="delete-pin-gallery">예술관 삭제</button>';
+    } else {
+      menu.innerHTML =
+          '<button class="context-menu__item" type="button">작품 신고</button>' +
+          '<button class="context-menu__item" type="button" data-action="hide-pin-card">이 작품 숨기기</button>';
+    }
     btn.closest('.art-gallery-card__action-group').appendChild(menu);
   }
 
@@ -1266,6 +1271,37 @@ window.addEventListener('load', () => {
     card.style.opacity = '0';
     card.style.transform = 'scale(0.8)';
     setTimeout(function() { card.remove(); }, 300);
+  }
+
+  function editPinGallery(btn) {
+    const card = btn.closest('.art-gallery-card');
+    const pinId = card ? card.getAttribute('data-id') : null;
+    const pin = pinId ? pinStore.get(pinId) : null;
+    if (pin && pin.author && pin.author.name) {
+      window.location.href = '/profile/' + encodeURIComponent(pin.author.name) + '?galleryId=' + pin.galleryId;
+    }
+  }
+
+  function deletePinGallery(btn) {
+    const card = btn.closest('.art-gallery-card');
+    const pinId = card ? card.getAttribute('data-id') : null;
+    const pin = pinId ? pinStore.get(pinId) : null;
+    if (!pin) return;
+
+    if (!confirm('이 예술관을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.')) return;
+
+    fetch('/api/galleries/' + pin.galleryId, { method: 'DELETE' })
+      .then(function(res) {
+        if (!res.ok) throw new Error('삭제 실패');
+        card.style.transition = 'opacity 0.3s, transform 0.3s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.8)';
+        setTimeout(function() { card.remove(); }, 300);
+        showCloseupMessage('예술관이 삭제되었습니다.', 'info');
+      })
+      .catch(function() {
+        showCloseupMessage('예술관 삭제에 실패했습니다.', 'error');
+      });
   }
 
   document.addEventListener('click', function(event) {
@@ -1335,6 +1371,14 @@ window.addEventListener('load', () => {
       case 'hide-pin-card':
         event.stopPropagation();
         hidePinCard(actionTarget);
+        break;
+      case 'edit-pin-gallery':
+        event.stopPropagation();
+        editPinGallery(actionTarget);
+        break;
+      case 'delete-pin-gallery':
+        event.stopPropagation();
+        deletePinGallery(actionTarget);
         break;
       default:
         break;

@@ -120,7 +120,7 @@
                                     <!-- Builder Header -->
                                     <div class="builder-header">
                                         <div class="builder-header-left"></div>
-                                        <button class="publish-btn" id="publishBtn" type="button" th:text="${isEdit} ? '수정 완료' : '게시'">게시</button>
+                                        <button class="publish-btn" id="publishBtn" type="button" th:text="${isEdit} ? '수정 완료' : '게시'" th:value="${isEdit} ? '수정 완료' : '게시'">게시</button>
                                     </div>
 
                                     <!-- Builder Body -->
@@ -141,7 +141,7 @@
                                         </div>
 
                                         <!-- Right: Form -->
-                                        <form class="form-section" id="contestForm" onsubmit="return false;" th:object="${contestForm}">
+                                        <form class="form-section" id="contestForm" onsubmit="return false;" th:object="${contestForm}" th:action="${isEdit} ? @{|/contest/${contestId}/edit|} : @{/contest/register}" method="post">
                                             <div class="legal-notice" th:if="${errorMessage != null}" style="margin-bottom:16px;border:1px solid #f1d0d0;background:#fff7f7;color:#9f2d2d;">
                                                 <span th:text="${errorMessage}">오류 메시지</span>
                                             </div>
@@ -185,15 +185,11 @@
                                                 <label>상금 및 부상</label>
                                                 <input type="text" th:field="*{prizeInfo}" placeholder="상금 및 부상을 작성해주세요." maxlength="100">
                                             </div>
-                                            <div class="form-group">
-                                                <label>참가비</label>
-                                                <input type="number" th:field="*{price}" placeholder="참가비를 입력해주세요.">
-                                            </div>
                                             <div class="legal-notice">
                                                 불법 촬영 콘텐츠 등을 게시하는 경우 BIDEO는 한국 전기통신사업법 제22-5(1)조에 따라 해당 콘텐츠의 액세스를 삭제하거나 차단할 수 있으며, 사용자는 관련 법률 및 <a href="#">규정</a>에 따라 처벌을 받을 수 있습니다.
                                             </div>
                                             <div class="form-group">
-                                                <button class="publish-btn" id="formSubmitBtn" type="button" th:text="${isEdit} ? '수정 완료' : '게시'">게시</button>
+                                                <button class="publish-btn" id="formSubmitBtn" type="button" th:text="${isEdit} ? '수정 완료' : '게시'" th:value="${isEdit} ? '수정 완료' : '게시'">게시</button>
                                             </div>
                                         </form>
                                     </div>
