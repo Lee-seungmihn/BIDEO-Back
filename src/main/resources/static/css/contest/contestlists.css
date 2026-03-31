@@ -281,6 +281,11 @@ body {
     border-color: var(--cl-accent);
 }
 
+.cl-btn-icon.active svg,
+.cl-btn-icon.active svg path {
+    fill: currentColor;
+}
+
 /* ===== 공유 버튼 그룹 ===== */
 .cl-share-group {
     display: flex;

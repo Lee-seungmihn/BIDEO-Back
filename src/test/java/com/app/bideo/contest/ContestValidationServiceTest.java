@@ -73,6 +73,19 @@ class ContestValidationServiceTest {
     }
 
     @Test
+    void updateContestRejectsWhenResultDateMatchesEntryEnd() {
+        ContestUpdateRequestDTO requestDTO = ContestUpdateRequestDTO.builder()
+                .title("수정 공모전")
+                .organizer("BIDEO")
+                .entryStart(LocalDate.of(2026, 3, 20))
+                .entryEnd(LocalDate.of(2026, 3, 30))
+                .resultDate(LocalDate.of(2026, 3, 30))
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> contestService.updateContest(9L, 7L, requestDTO));
+    }
+
+    @Test
     void createContestSavesWhenRequestIsValid() {
         ContestCreateRequestDTO requestDTO = ContestCreateRequestDTO.builder()
                 .title("공모전")

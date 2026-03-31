@@ -259,7 +259,7 @@ window.addEventListener('load', () => {
 
   // ─── 모든 사이드 패널 제거 헬퍼 ──────────────────────
   function removeAllSidePanels() {
-    ['create-menu', 'update-menu', 'message-menu', 'settings-menu'].forEach(function (id) {
+    ['create-menu', 'notification-menu', 'update-menu', 'message-menu', 'settings-menu'].forEach(function (id) {
       const menu = document.getElementById(id);
       if (menu) menu.remove();
     });
@@ -347,13 +347,14 @@ window.addEventListener('load', () => {
       const dropdown = document.createElement('div');
       dropdown.id = 'account-dropdown';
       dropdown.className = 'dropdown-menu';
+      const currentNickname = window.__bideoUserNickname || '사용자';
       dropdown.innerHTML =
           '<div class="dropdown-menu__section">' +
           '<div class="dropdown-menu__header">현재 로그인</div>' +
           '<a href="/profile" class="dropdown-menu__user" style="text-decoration:none;color:inherit;cursor:pointer;">' +
           '<img class="dropdown-menu__avatar" src="' + LOCAL_PROFILE_IMAGE + '" alt="프로필">' +
           '<div class="dropdown-menu__user-info">' +
-          '<div class="dropdown-menu__user-name">사용자</div>' +
+          '<div class="dropdown-menu__user-name">' + msgEscapeHtml(currentNickname) + '</div>' +
           '</div>' +
           '</a>' +
           '</div>' +
@@ -443,109 +444,267 @@ window.addEventListener('load', () => {
     const btn = document.querySelector('[aria-label="알림"]');
     if (!btn) return;
 
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const existing = document.getElementById('update-menu');
-      if (existing) {
-        existing.remove();
-        resetAllNavIcons();
-        return;
+    const panelId = 'notification-menu';
+    const navItem = btn.closest('.side-nav__item--updates');
+
+    function createBadge() {
+      let badge = btn.querySelector('.notification-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'notification-badge';
+        badge.style.display = 'none';
+        const iconWrap = btn.querySelector('.side-nav__icon-wrap');
+        if (iconWrap) {
+          iconWrap.style.position = 'relative';
+          iconWrap.appendChild(badge);
+        }
       }
-
-      removeAllSidePanels();
-      closeAllMenus();
-      const nav = document.getElementById('VerticalNavContent');
-      const panel = document.createElement('div');
-      panel.id = 'update-menu';
-      panel.className = 'side-panel';
-      panel.innerHTML = buildAlarmPanelShell();
-
-      panel.addEventListener('click', function (e) {
-        e.stopPropagation();
-      });
-      nav.after(panel);
-
-      panel.querySelector('.side-panel__close').addEventListener('click', function (e) {
-        e.stopPropagation();
-        panel.remove();
-        resetAllNavIcons();
-      });
-
-      loadNotificationsFromAPI(panel);
-    });
-  }
-
-  function buildAlarmPanelShell() {
-    return `
-      <div class="side-panel__header" style="padding: 24px 20px 12px; display:flex; justify-content:space-between; align-items:center;">
-        <h2 class="side-panel__title" style="font-size:18px; font-weight:700; margin:0;">알림</h2>
-        <button class="side-panel__close button-reset icon-container rounded-circle" style="width:32px; height:32px;"><svg height="16" viewBox="0 0 24 24" width="16"><path d="m12 13.41 8.3 8.3 1.4-1.42L13.42 12l8.3-8.3-1.42-1.4-8.3 8.28-8.3-8.3L2.3 3.7l8.28 8.3-8.3 8.3 1.42 1.4z"></path></svg></button>
-      </div>
-      <div class="side-panel__body" id="alarm-list-body">
-        <div style="padding:40px 16px; text-align:center; color:#767676; font-size:14px;">불러오는 중...</div>
-      </div>`;
-  }
-
-  function formatNotiTime(dateStr) {
-    const now = new Date();
-    const date = new Date(dateStr);
-    const diff = Math.floor((now - date) / 1000);
-    if (diff < 60) return '방금 전';
-    if (diff < 3600) return Math.floor(diff / 60) + '분 전';
-    if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
-    if (diff < 172800) return '어제';
-    return Math.floor(diff / 86400) + '일 전';
-  }
-
-  function renderAlarmItems(notifications) {
-    if (!notifications || notifications.length === 0) {
-      return '<div style="padding:40px 16px; text-align:center; color:#767676; font-size:14px;">알림이 없습니다.</div>';
+      return badge;
     }
 
-    const systemTypes = ['AUCTION_END', 'SETTLEMENT'];
+    const badge = createBadge();
 
-    return notifications.map(function (n, i) {
-      const userName = n.senderNickname || 'BIDEO';
-      const isSystem = !n.senderId || systemTypes.indexOf(n.notiType) !== -1;
-      const avatarSrc = n.senderProfileImage || LOCAL_PROFILE_IMAGE;
-      const time = formatNotiTime(n.createdDatetime);
-      const unreadDot = !n.isRead
-          ? '<div style="width:8px; height:8px; background:#f0d999; border-radius:50%; flex-shrink:0;"></div>'
-          : '';
+    function renderBadge(count) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : String(count);
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
 
-      return '<div class="side-panel__update-item" style="padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background=\'#f0f0f0\'" onmouseout="this.style.background=\'none\'">'
-          + '<img src="' + avatarSrc + '" style="width:48px; height:48px; border-radius:50%; object-fit:cover;">'
-          + '<div style="flex:1;">'
-          + '<div style="font-size:14px; color:#111; line-height:1.4;"><strong>' + userName + '</strong> ' + n.message + '</div>'
-          + '<div style="font-size:12px; color:#767676; margin-top:2px;">' + time + '</div>'
-          + '</div>'
-          + unreadDot
-          + '</div>';
-    }).join('');
-  }
+    function timeAgo(dateStr) {
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diff = Math.floor((now - date) / 1000);
 
-  function loadNotificationsFromAPI(panel) {
-    const body = panel.querySelector('#alarm-list-body');
+      if (diff < 60) return '방금 전';
+      if (diff < 3600) return Math.floor(diff / 60) + '분 전';
+      if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
+      if (diff < 604800) return Math.floor(diff / 86400) + '일 전';
+      return date.toLocaleDateString('ko-KR');
+    }
 
-    fetch('/api/notifications')
+    function getTargetUrl(item) {
+      if (!item.targetType || !item.targetId) return '';
+      if (item.notiType === 'FOLLOW' && item.targetType === 'MEMBER') {
+        return '';
+      }
+      switch (item.targetType) {
+        case 'WORK': return '/work/detail/' + item.targetId;
+        case 'AUCTION': return '/auction/auction-detail/' + item.targetId;
+        case 'GALLERY': return '/gallery/' + item.targetId;
+        case 'CONTEST': return '/contest/detail/' + item.targetId;
+        case 'MEMBER': return '/profile/' + item.targetId;
+        default: return '';
+      }
+    }
+
+    function getPanel() {
+      return document.getElementById(panelId);
+    }
+
+    function updateBadge() {
+      fetch('/api/notifications/unread-count')
         .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
+          if (!res.ok) throw new Error('badge');
           return res.json();
         })
         .then(function (data) {
-          body.innerHTML = renderAlarmItems(data);
+          renderBadge(data.count || 0);
+        })
+        .catch(function () {});
+    }
+
+    function syncBadgeFromPanel(panel) {
+      if (!panel) {
+        updateBadge();
+        return;
+      }
+      renderBadge(panel.querySelectorAll('.notification-item--unread').length);
+    }
+
+    function markNotificationAsRead(item, panel) {
+      if (!item || !item.classList.contains('notification-item--unread')) {
+        return;
+      }
+      item.classList.remove('notification-item--unread');
+      syncBadgeFromPanel(panel);
+      fetch('/api/notifications/' + item.dataset.id + '/read', {
+        method: 'PATCH',
+        keepalive: true
+      }).catch(function () {});
+    }
+
+    function buildNotificationItem(item) {
+      const unreadClass = item.isRead ? '' : ' notification-item--unread';
+      const senderName = item.senderNickname || 'BIDEO';
+      const avatarSrc = item.senderProfileImage || LOCAL_PROFILE_IMAGE;
+      const url = getTargetUrl(item);
+
+      return '<div class="notification-item' + unreadClass + '" data-id="' + item.id + '">'
+        + '<button type="button" class="notification-item__action button-reset"'
+        + ' data-id="' + item.id + '"'
+        + ' data-target-type="' + (item.targetType || '') + '"'
+        + ' data-target-id="' + (item.targetId || '') + '"'
+        + ' data-message-room-id="' + (item.messageRoomId || '') + '"'
+        + (url ? ' data-url="' + url + '"' : '')
+        + '>'
+        + '<img class="notification-item__avatar" src="' + avatarSrc + '" alt="">'
+        + '<div class="notification-item__body">'
+        + '<p class="notification-item__message"><strong>' + senderName + '</strong> ' + (item.message || '') + '</p>'
+        + '<span class="notification-item__time">' + timeAgo(item.createdDatetime) + '</span>'
+        + '</div>'
+        + '</button>'
+        + '<button class="notification-item__delete" data-id="' + item.id + '" aria-label="삭제">&times;</button>'
+        + '</div>';
+    }
+
+    function loadNotifications(panel) {
+      const list = panel.querySelector('.notification-panel__list');
+      fetch('/api/notifications?page=0')
+        .then(function (res) {
+          if (!res.ok) throw new Error('notifications');
+          return res.json();
+        })
+        .then(function (data) {
+          if (!data || data.length === 0) {
+            list.innerHTML = '<div class="notification-panel__empty">알림이 없습니다.</div>';
+            syncBadgeFromPanel(panel);
+            return;
+          }
+          list.innerHTML = data.map(buildNotificationItem).join('');
+          syncBadgeFromPanel(panel);
         })
         .catch(function () {
-          body.innerHTML = renderAlarmItems(getFallbackAlarms());
+          list.innerHTML = '<div class="notification-panel__empty">알림을 불러올 수 없습니다.</div>';
         });
-  }
+    }
 
-  function getFallbackAlarms() {
-    return [
-      {senderNickname: '정찬호', message: '님이 경매를 시작하였습니다.', notiType: 'BID', isRead: false, createdDatetime: new Date().toISOString()},
-      {senderNickname: 'BIDEO', message: '경매 종료 임박! 마지막 입찰 기회를 놓치지 마세요.', notiType: 'AUCTION_END', isRead: false, createdDatetime: new Date(Date.now() - 600000).toISOString()},
-      {senderNickname: '이수진', message: '님이 당신의 작품에 좋아요를 눌렀습니다.', notiType: 'LIKE', isRead: true, createdDatetime: new Date(Date.now() - 86400000).toISOString()}
-    ];
+    function closeNotificationPanel() {
+      const panel = getPanel();
+      if (!panel) return;
+      panel.remove();
+      resetAllNavIcons();
+    }
+
+    function openNotificationPanel() {
+      removeAllSidePanels();
+      closeAllMenus();
+      const panel = document.createElement('div');
+      panel.id = panelId;
+      panel.className = 'notification-panel-shell';
+      panel.innerHTML =
+        '<div class="side-panel notification-panel">'
+        + '<div class="side-panel__header">'
+        + '<h2 class="side-panel__title">알림</h2>'
+        + '<div class="side-panel__header-actions">'
+        + '<button class="side-panel__text-action notification-panel__read-all" type="button">모두 읽음</button>'
+        + '<button class="side-panel__close" aria-label="알림 닫기" type="button">'
+        + '<svg aria-hidden="true" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24" width="18"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>'
+        + '</button>'
+        + '</div>'
+        + '</div>'
+        + '<div class="side-panel__body notification-panel__body">'
+        + '<div class="notification-panel__list">'
+        + '<div class="notification-panel__empty">불러오는 중...</div>'
+        + '</div>'
+        + '<div class="side-panel__settings-divider"></div>'
+        + '<a class="side-panel__settings-item side-panel__settings-item--external notification-panel__settings" href="/notification">'
+        + '<span>알림 설정</span>'
+        + '<svg aria-hidden="true" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24" width="18"><path d="m9 18 6-6-6-6"></path></svg>'
+        + '</a>'
+        + '</div>'
+        + '</div>';
+
+      panel.addEventListener('click', function (e) {
+        e.stopPropagation();
+
+        const closeBtn = e.target.closest('.side-panel__close');
+        if (closeBtn) {
+          closeNotificationPanel();
+          return;
+        }
+
+        const deleteBtn = e.target.closest('.notification-item__delete');
+        if (deleteBtn) {
+          const item = deleteBtn.closest('.notification-item');
+          fetch('/api/notifications/' + deleteBtn.dataset.id, { method: 'DELETE' })
+            .then(function () {
+              if (item) item.remove();
+              const list = panel.querySelector('.notification-panel__list');
+              if (list && !list.querySelector('.notification-item')) {
+                list.innerHTML = '<div class="notification-panel__empty">알림이 없습니다.</div>';
+              }
+              syncBadgeFromPanel(panel);
+            })
+            .catch(function () {});
+          return;
+        }
+
+        const readAllBtn = e.target.closest('.notification-panel__read-all');
+        if (readAllBtn) {
+          fetch('/api/notifications/read-all', { method: 'PATCH' })
+            .then(function () {
+              panel.querySelectorAll('.notification-item--unread').forEach(function (item) {
+                item.classList.remove('notification-item--unread');
+              });
+              syncBadgeFromPanel(panel);
+            })
+            .catch(function () {});
+          return;
+        }
+
+        const actionBtn = e.target.closest('.notification-item__action');
+        if (!actionBtn) return;
+
+        const item = actionBtn.closest('.notification-item');
+        const targetType = actionBtn.dataset.targetType;
+        const url = actionBtn.dataset.url;
+
+        markNotificationAsRead(item, panel);
+
+        if (targetType === 'MESSAGE') {
+          closeNotificationPanel();
+          if (typeof msgOpenFromNotification === 'function') {
+            msgOpenFromNotification({
+              notificationId: Number(actionBtn.dataset.id),
+              messageId: Number(actionBtn.dataset.targetId),
+              messageRoomId: Number(actionBtn.dataset.messageRoomId)
+            });
+          } else {
+            showToast('메시지 창을 열 수 없습니다.');
+          }
+          return;
+        }
+
+        if (url) {
+          window.location.href = url;
+        }
+      });
+
+      const nav = document.getElementById('VerticalNavContent');
+      if (nav) {
+        nav.after(panel);
+      } else {
+        document.body.appendChild(panel);
+      }
+
+      loadNotifications(panel);
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (getPanel()) {
+        closeNotificationPanel();
+        return;
+      }
+      openNotificationPanel();
+    });
+
+    updateBadge();
+    setInterval(updateBadge, 30000);
   }
 
   // ─── 메시지 패널 헬퍼 함수들 ─────────────────────────
@@ -558,7 +717,7 @@ window.addEventListener('load', () => {
   let msgEditingMessageId = null;
   let msgCurrentPartnerName = '';
   let msgCurrentPartnerAvatar = LOCAL_PROFILE_IMAGE;
-  let msgFocusedMessageTimer = null;
+  let msgOpenFromNotification = null;
 
   function msgTimeAgo(dateStr) {
     if (!dateStr) return '';
@@ -761,13 +920,19 @@ window.addEventListener('load', () => {
       if (msg.canDelete) {
         btns += '<button type="button" class="button-reset" data-message-action="delete" data-message-id="' + msg.id + '" style="cursor:pointer;color:#767676;font-size:13px;" title="삭제">✕</button>';
       }
-      btns += '<button type="button" class="button-reset" data-message-action="like" data-message-id="' + msg.id + '" style="cursor:pointer;color:' + (msg.isLiked ? '#e60023' : '#767676') + ';font-size:13px;" title="좋아요">' + likeIcon + '</button>';
-      hoverActions = '<div class="msg-hover-actions" style="display:flex;align-items:center;gap:4px;flex-shrink:0;">' + btns + '</div>';
+      if (msg.isLiked) {
+        btns += '<button type="button" class="button-reset" data-message-action="like" data-message-id="' + msg.id + '" style="cursor:pointer;color:#e60023;font-size:15px;" title="좋아요 취소">♥</button>';
+      } else {
+        btns += '<button type="button" class="button-reset" data-message-action="like" data-message-id="' + msg.id + '" style="cursor:pointer;color:#767676;font-size:13px;" title="좋아요">♡</button>';
+      }
+      const hoverClass = msg.isLiked ? '' : ' msg-hover-actions';
+      hoverActions = '<div class="' + hoverClass + '" style="display:flex;align-items:center;gap:4px;flex-shrink:0;">' + btns + '</div>';
     }
 
     const timeLabel = '<span style="font-size:10px;color:#767676;white-space:nowrap;flex-shrink:0;">' + msgEscapeHtml(msgFormatBubbleTime(msg.createdDatetime)) + (msg.edited ? ' · 수정됨' : '') + '</span>';
 
     const galleryMatch = msg.content ? msg.content.match(/^\[gallery\](.*?)\[\/gallery\](.*)$/) : null;
+    const contestMatch = msg.content ? msg.content.match(/^\[contest\](.*?)\[\/contest\](.*)$/) : null;
     let bubbleInner;
     if (galleryMatch && !msg.deleted) {
       const galleryUrl = galleryMatch[1];
@@ -781,6 +946,18 @@ window.addEventListener('load', () => {
         + '</div>'
         + '</div>'
         + '</a>';
+    } else if (contestMatch && !msg.deleted) {
+      const contestUrl = contestMatch[1];
+      const contestTitle = contestMatch[2] || '공모전';
+      bubbleInner = '<a href="' + msgEscapeHtml(contestUrl) + '" style="display:block;text-decoration:none;color:inherit;">'
+        + '<div style="display:flex;align-items:center;gap:10px;">'
+        + '<div style="width:48px;height:48px;border-radius:8px;background:#fff3e0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">🏆</div>'
+        + '<div style="min-width:0;">'
+        + '<div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + msgEscapeHtml(contestTitle) + '</div>'
+        + '<div style="font-size:11px;color:' + (isMine ? 'rgba(255,255,255,.6)' : '#767676') + ';margin-top:2px;">공모전 보기</div>'
+        + '</div>'
+        + '</div>'
+        + '</a>';
     } else {
       bubbleInner = msgRenderReplyPreview(msg) + '<div>' + msgEscapeHtml(msg.content) + '</div>';
     }
@@ -789,9 +966,15 @@ window.addEventListener('load', () => {
       + bubbleInner
       + '</div>';
 
+    const metaAlign = isMine ? 'flex-end' : 'flex-start';
+    const metaColumn = '<div style="display:flex;flex-direction:column;align-items:' + metaAlign + ';gap:2px;flex-shrink:0;justify-content:flex-end;">'
+      + hoverActions
+      + timeLabel
+      + '</div>';
+
     const innerParts = isMine
-      ? hoverActions + timeLabel + bubble
-      : '<img src="' + msgEscapeHtml(avatar) + '" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;">' + bubble + timeLabel + hoverActions;
+      ? metaColumn + bubble
+      : '<img src="' + msgEscapeHtml(avatar) + '" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;">' + bubble + metaColumn;
 
     return '<div class="msg-bubble-row" data-message-id="' + msg.id + '" style="display:flex;justify-content:' + rowJustify + ';margin-bottom:14px;">'
       + '<div style="display:flex;align-items:flex-end;gap:6px;max-width:82%;">'
@@ -819,15 +1002,7 @@ window.addEventListener('load', () => {
     const target = sidePanel.querySelector('.msg-bubble-row[data-message-id="' + messageId + '"]');
     if (!chatBody || !target) return false;
 
-    chatBody.querySelectorAll('.msg-bubble-row--focused').forEach(function(item) {
-      item.classList.remove('msg-bubble-row--focused');
-    });
-    target.classList.add('msg-bubble-row--focused');
     target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    if (msgFocusedMessageTimer) clearTimeout(msgFocusedMessageTimer);
-    msgFocusedMessageTimer = setTimeout(function() {
-      target.classList.remove('msg-bubble-row--focused');
-    }, 3000);
     return true;
   }
 
@@ -894,7 +1069,7 @@ window.addEventListener('load', () => {
   }
 
   function buildMessageListHTML() {
-    return '<style>#message-menu *:focus { outline: none; } .msg-bubble-row .msg-hover-actions { opacity:0; transition:opacity .15s; } .msg-bubble-row:hover .msg-hover-actions { opacity:1; } .msg-bubble-row--focused > div { box-shadow:0 0 0 2px rgba(230,0,35,.18); border-radius:22px; background:rgba(230,0,35,.06); transition:background .25s ease, box-shadow .25s ease; }</style>' +
+    return '<style>#message-menu *:focus { outline: none; } .msg-bubble-row .msg-hover-actions { opacity:0; transition:opacity .15s; } .msg-bubble-row:hover .msg-hover-actions { opacity:1; } .msg-pinned-like:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(17,17,17,.12); }</style>' +
         '<div class="side-panel">' +
         '<div class="side-panel__header">' +
         '<h2 class="side-panel__title">메시지</h2>' +
@@ -1158,6 +1333,8 @@ window.addEventListener('load', () => {
         });
     }
 
+    msgOpenFromNotification = openMessageFromNotification;
+
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       const existing = document.getElementById('message-menu');
@@ -1217,9 +1394,6 @@ window.addEventListener('load', () => {
       }
     });
 
-    window.addEventListener('bideo:open-message-notification', function(event) {
-      openMessageFromNotification(event.detail || {});
-    });
   }
 
   // ─── 새 메시지 패널 (API 검색) ────────────────────────

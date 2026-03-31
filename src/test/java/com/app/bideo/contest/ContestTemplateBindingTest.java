@@ -50,8 +50,13 @@ class ContestTemplateBindingTest {
         assertTrue(template.contains("th:if=\"${successMessage != null}\""));
         assertTrue(template.contains("th:if=\"${errorMessage != null}\""));
         assertTrue(template.contains("th:each=\"entry : ${entries}\""));
+        assertTrue(template.contains("th:attr=\"data-work-id=${entry.workId}\""));
         assertTrue(template.contains("th:text=\"${entry.workTitle}\""));
         assertTrue(template.contains("th:text=\"${entry.memberNickname}\""));
+        assertTrue(template.contains("th:if=\"${canSelectWinner}\""));
+        assertTrue(template.contains("th:action=\"@{|/contest/${contest.id}/winner|}\""));
+        assertTrue(template.contains("th:checked=\"${entry.awardRank == '우승'}\""));
+        assertTrue(template.contains("th:replace=\"~{common/fragments/work-detail-modal :: workDetailModalBundle}\""));
         assertTrue(template.contains("th:if=\"${#lists.isEmpty(entries)}\""));
     }
 

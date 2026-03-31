@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class GalleryListResponseDTO {
     private Long id;
+    private Long memberId;
     private String title;
     private String description;
     private String coverImage;

@@ -28,6 +28,7 @@
 <body style="margin:0">
 <script th:if="${currentUserId != null}" th:inline="javascript">
     window.__bideoUserId = /*[[${currentUserId}]]*/ null;
+    window.__bideoUserNickname = /*[[${currentUserNickname}]]*/ null;
 </script>
 <!-- navigation -->
 <nav th:replace="~{/common/navigation::navigation}"></nav>

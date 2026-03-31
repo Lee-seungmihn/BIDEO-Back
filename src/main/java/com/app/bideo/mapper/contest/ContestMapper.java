@@ -9,6 +9,7 @@ import com.app.bideo.dto.contest.ContestSearchDTO;
 import com.app.bideo.dto.contest.ContestEntryRequestDTO;
 import com.app.bideo.dto.contest.ContestWorkOptionDTO;
 import com.app.bideo.dto.contest.ContestUpdateRequestDTO;
+import com.app.bideo.dto.contest.ContestWinnerNotificationDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,9 +40,17 @@ public interface ContestMapper {
 
     boolean existsContestEntry(@Param("contestId") Long contestId, @Param("workId") Long workId);
 
+    boolean existsContestEntryById(@Param("contestId") Long contestId, @Param("entryId") Long entryId);
+
     void insertContestEntry(@Param("memberId") Long memberId, @Param("entry") ContestEntryRequestDTO entry);
 
     void increaseContestEntryCount(@Param("contestId") Long contestId);
+
+    void clearContestWinner(@Param("contestId") Long contestId);
+
+    int updateContestWinner(@Param("contestId") Long contestId,
+                            @Param("entryId") Long entryId,
+                            @Param("awardRank") String awardRank);
 
     List<ContestWorkOptionDTO> selectEntryWorkOptions(@Param("memberId") Long memberId);
 
@@ -54,4 +63,8 @@ public interface ContestMapper {
     void insertContestTag(@Param("contestId") Long contestId, @Param("tagId") Long tagId);
 
     void deleteContestTagsByContestId(@Param("contestId") Long contestId);
+
+    List<ContestWinnerNotificationDTO> selectPendingWinnerNotifications(@Param("todayEpochDay") long todayEpochDay);
+
+    void markWinnerNotificationSent(@Param("contestId") Long contestId);
 }

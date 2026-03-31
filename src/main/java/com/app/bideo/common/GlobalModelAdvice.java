@@ -27,4 +27,15 @@ public class GlobalModelAdvice {
         }
         return null;
     }
+
+    @ModelAttribute("currentUserNickname")
+    public String currentUserNickname() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken)
+                && auth.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) auth.getPrincipal()).getNickname();
+        }
+        return null;
+    }
 }

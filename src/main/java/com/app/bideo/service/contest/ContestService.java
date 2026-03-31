@@ -9,16 +9,17 @@ import com.app.bideo.dto.contest.ContestListResponseDTO;
 import com.app.bideo.dto.contest.ContestSearchDTO;
 import com.app.bideo.dto.contest.ContestWorkOptionDTO;
 import com.app.bideo.dto.contest.ContestUpdateRequestDTO;
+import com.app.bideo.dto.contest.ContestWinnerNotificationDTO;
 import com.app.bideo.mapper.contest.ContestMapper;
 import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Base64;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -85,6 +86,8 @@ public class ContestService {
         if (!contestMapper.existsContest(requestDTO.getContestId())) {
             throw new IllegalArgumentException("contest not found");
         }
+        ContestDetailResponseDTO contest = contestMapper.selectContestDetail(requestDTO.getContestId(), null);
+        validateEntryPeriod(contest);
         Long ownerId = contestMapper.selectContestOwnerId(requestDTO.getContestId());
         if (ownerId != null && ownerId.equals(memberId)) {
             throw new IllegalArgumentException("자신의 공모전에는 참여할 수 없습니다");
@@ -104,6 +107,49 @@ public class ContestService {
                     ownerId, memberId, "CONTEST_ENTRY", "CONTEST",
                     requestDTO.getContestId(), "공모전에 새로운 참가 작품이 등록되었습니다."
             );
+        }
+    }
+
+    public void selectWinner(Long contestId, Long memberId, Long entryId) {
+        ContestDetailResponseDTO contest = contestMapper.selectContestDetail(contestId, null);
+        if (contest == null) {
+            throw new IllegalArgumentException("contest not found");
+        }
+        if (contest.getMemberId() == null || !contest.getMemberId().equals(memberId)) {
+            throw new IllegalArgumentException("contest not found or not owned by member");
+        }
+        if (contest.getWinnerNotifiedAt() != null) {
+            throw new IllegalStateException("winner already announced");
+        }
+        if (contest.getEntryEnd() == null || !LocalDate.now().isAfter(contest.getEntryEnd())) {
+            throw new IllegalStateException("winner selection not available yet");
+        }
+        if (!contestMapper.existsContestEntryById(contestId, entryId)) {
+            throw new IllegalArgumentException("contest entry not found");
+        }
+
+        contestMapper.clearContestWinner(contestId);
+        int updated = contestMapper.updateContestWinner(contestId, entryId, "우승");
+        if (updated == 0) {
+            throw new IllegalArgumentException("contest entry not found");
+        }
+    }
+
+    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
+    public void dispatchWinnerNotifications() {
+        List<ContestWinnerNotificationDTO> winners =
+                contestMapper.selectPendingWinnerNotifications(LocalDate.now().toEpochDay());
+
+        for (ContestWinnerNotificationDTO winner : winners) {
+            notificationService.createNotification(
+                    winner.getWinnerMemberId(),
+                    winner.getContestOwnerId(),
+                    "CONTEST_WIN",
+                    "CONTEST",
+                    winner.getContestId(),
+                    "공모전 우승작으로 선정되었습니다."
+            );
+            contestMapper.markWinnerNotificationSent(winner.getContestId());
         }
     }
 
@@ -201,8 +247,18 @@ public class ContestService {
         if (entryStart.isAfter(entryEnd)) {
             throw new IllegalArgumentException("entry period is invalid");
         }
-        if (resultDate != null && resultDate.isBefore(entryEnd)) {
+        if (resultDate != null && !resultDate.isAfter(entryEnd)) {
             throw new IllegalArgumentException("result date is invalid");
+        }
+    }
+
+    private void validateEntryPeriod(ContestDetailResponseDTO contest) {
+        if (contest == null || contest.getEntryStart() == null || contest.getEntryEnd() == null) {
+            throw new IllegalArgumentException("contest not found");
+        }
+        LocalDate today = LocalDate.now();
+        if (today.isBefore(contest.getEntryStart()) || today.isAfter(contest.getEntryEnd())) {
+            throw new IllegalArgumentException("contest entry period is closed");
         }
     }
 }

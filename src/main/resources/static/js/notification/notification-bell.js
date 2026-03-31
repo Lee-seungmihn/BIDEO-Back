@@ -23,6 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const badge = createBadge();
 
+    function renderBadge(count) {
+        if (count > 0) {
+            badge.textContent = count > 99 ? "99+" : count;
+            badge.style.display = "";
+        } else {
+            badge.style.display = "none";
+        }
+    }
+
     function updateBadge() {
         fetch("/api/notifications/unread-count")
             .then(res => {
@@ -30,15 +39,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 return res.json();
             })
             .then(data => {
-                const count = data.count || 0;
-                if (count > 0) {
-                    badge.textContent = count > 99 ? "99+" : count;
-                    badge.style.display = "";
-                } else {
-                    badge.style.display = "none";
-                }
+                renderBadge(data.count || 0);
             })
             .catch(() => {});
+    }
+
+    function syncBadgeFromPanel() {
+        if (!panel) {
+            updateBadge();
+            return;
+        }
+        const unreadCount = panel.querySelectorAll(".notification-item--unread").length;
+        renderBadge(unreadCount);
     }
 
     function timeAgo(dateStr) {
@@ -67,15 +79,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function markNotificationAsRead(item) {
         if (!item || !item.classList.contains("notification-item--unread")) {
-            return Promise.resolve();
+            return;
         }
 
-        return fetch("/api/notifications/" + item.dataset.id + "/read", { method: "PATCH" })
-            .then(() => {
-                item.classList.remove("notification-item--unread");
-                updateBadge();
-            })
-            .catch(() => {});
+        item.classList.remove("notification-item--unread");
+        syncBadgeFromPanel();
+
+        fetch("/api/notifications/" + item.dataset.id + "/read", {
+            method: "PATCH",
+            keepalive: true
+        }).catch(() => {});
     }
 
     function openMessageNotification(item) {
@@ -90,6 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        window.__bideoPendingMessageNotification = detail;
+        if (typeof window.__bideoOpenMessageNotification === "function") {
+            window.__bideoOpenMessageNotification(detail);
+        }
         window.dispatchEvent(new CustomEvent("bideo:open-message-notification", { detail }));
         isOpen = false;
         panel.classList.remove("notification-panel--open");
@@ -194,16 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const url = item.dataset.url;
                 const targetType = item.dataset.targetType;
 
-                markNotificationAsRead(item).then(() => {
-                    if (targetType === "MESSAGE") {
-                        openMessageNotification(item);
-                        return;
-                    }
+                markNotificationAsRead(item);
+                if (targetType === "MESSAGE") {
+                    openMessageNotification(item);
+                    return;
+                }
 
-                    if (url) {
-                        window.location.href = url;
-                    }
-                });
+                if (url) {
+                    window.location.href = url;
+                }
             }
         });
 

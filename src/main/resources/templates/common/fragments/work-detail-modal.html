@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="workDetailModalBundle">
+  <div class="modal-overlay work-detail-modal-overlay" id="workDetailModal" onclick="closeWorkDetailModal(event)">
+    <div class="work-detail-sheet">
+      <button class="work-detail-close" type="button" onclick="closeWorkDetailModal()">&times;</button>
+      <div class="work-detail-media-wrap" id="workDetailMediaWrap"></div>
+      <div class="work-detail-body">
+        <div class="work-detail-top">
+          <div class="work-detail-author-row">
+            <img class="work-detail-avatar" id="workDetailAvatar" src="/images/BIDEO_LOGO/BIDEO_favicon.png" alt="작성자">
+            <div class="work-detail-author-copy">
+              <div class="work-detail-author-meta">
+                <span class="work-detail-author" id="workDetailAuthor">작성자</span>
+              </div>
+              <div class="work-detail-title" id="workDetailTitle">제목</div>
+              <div class="work-detail-description" id="workDetailDescription">설명</div>
+              <div class="meta-item work-detail-meta-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span class="work-detail-view-count" id="workDetailViewCount">조회수 0회</span>
+              </div>
+              <div class="work-detail-tags" id="workDetailTags"></div>
+              <div class="work-detail-date" id="workDetailDate">작성일</div>
+            </div>
+          </div>
+          <div class="work-detail-actions">
+            <div class="work-detail-action-row">
+              <div class="work-detail-like-stack">
+                <button class="work-detail-icon-btn work-detail-like-btn" id="workDetailLikeButton" type="button" title="좋아요" aria-pressed="false"></button>
+                <span class="work-detail-like-count" id="workDetailLikeCount">0</span>
+              </div>
+              <div class="work-detail-like-stack">
+                <button class="work-detail-icon-btn" type="button" title="댓글">
+                  <svg aria-label="댓글 달기" fill="#262626" viewBox="0 0 24 24">
+                    <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"/>
+                  </svg>
+                </button>
+                <span class="work-detail-like-count" id="workDetailCommentSummary">댓글 0개</span>
+              </div>
+              <div class="work-detail-like-stack">
+                <button class="work-detail-icon-btn" id="workDetailShareButton" type="button" title="공유">
+                  <svg aria-label="게시물 공유" fill="#262626" viewBox="0 0 24 24">
+                    <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="3" y2="10.083"/>
+                    <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" stroke-linejoin="round" stroke-width="2"/>
+                  </svg>
+                </button>
+                <span class="work-detail-like-count">공유하기</span>
+              </div>
+              <div class="work-detail-like-stack" id="workDetailSavedWrap">
+                <button class="work-detail-icon-btn" id="workDetailSavedButton" type="button" title="찜하기" aria-label="찜하기">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
+                <span class="work-detail-like-count">찜하기</span>
+              </div>
+            </div>
+            <div class="work-detail-price" id="workDetailPrice"></div>
+          </div>
+        </div>
+        <div class="work-detail-comment-input">
+          <input type="text" id="workDetailCommentInput" placeholder="댓글 입력...">
+          <button type="button" id="workDetailCommentSubmit">게시</button>
+        </div>
+        <div class="work-detail-comment-list">
+          <div id="workDetailCommentsContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>

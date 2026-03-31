@@ -30,5 +30,6 @@ public class ContestDetailResponseDTO {
     private Integer viewCount;
     private List<TagResponseDTO> tags;
     private Boolean isBookmarked;
+    private LocalDateTime winnerNotifiedAt;
     private LocalDateTime createdDatetime;
 }

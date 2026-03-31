@@ -192,6 +192,12 @@
     flex-shrink: 0;
 }
 
+.side-panel__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .side-panel__title {
     margin: 0;
     font-size: 20px;
@@ -214,6 +220,22 @@
 
 .side-panel__close:hover {
     background: var(--border-color);
+}
+
+.side-panel__text-action {
+    border: none;
+    background: none;
+    border-radius: 999px;
+    color: #000;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 8px 10px;
+}
+
+.side-panel__text-action:hover {
+    background: #f0f7ff;
 }
 
 .side-panel__body {
@@ -483,7 +505,6 @@
 .side-panel__settings-divider {
     height: 1px;
     background: var(--border-color);
-    margin: 8px 0;
 }
 
 .side-panel__settings-section-title {
